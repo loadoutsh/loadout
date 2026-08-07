@@ -1,0 +1,15 @@
+# Open a project from the projects directory in the editor
+# Example: `pv wc/qotm' opens {{ .Paths.ProjectRoot }}/wc/qotm
+pv() {
+	if [[ -z $1 ]]; then
+		echo 'Please specify a project name or path'
+		return 1
+	fi
+
+	if [[ -e "{{ shpath .Paths.ProjectRoot }}/$1" ]]; then
+		{{ .Editor }} "{{ shpath .Paths.ProjectRoot }}/$1"
+	else
+		echo 'Project name or path does not exist'
+		return 1
+	fi
+}

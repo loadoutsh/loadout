@@ -1,0 +1,71 @@
+# SSH helper. Accepts a configured host alias, a bare last octet, or a hostname
+msh() {
+	local keyfile="{{ .SSH.DefaultKey }}"
+	local user="{{ .SSH.DefaultUser }}"
+	local host="{{ .SSH.DefaultHost }}"
+	local port="{{ .SSH.DefaultPort }}"
+	local ssh_dir="$HOME/.ssh"
+
+	local help_text="SSH helper
+
+Usage: msh [-k keyfile] [-u user] [-m machine] [-p port] [-h]
+
+  -k  SSH key filename in ~/.ssh (default: $keyfile)
+  -u  Username (default: $user)
+  -m  Host alias, hostname, or a bare last octet (default: $host)
+  -p  Port (default: $port)
+  -h  Show this message
+
+Configured host aliases: {{ .HostAliases }}"
+
+	local opt
+	while getopts ":k:p:u:m:h" opt; do
+		case $opt in
+			k) keyfile="$OPTARG" ;;
+			u) user="$OPTARG" ;;
+			m) host="$OPTARG" ;;
+			p) port="$OPTARG" ;;
+			h)
+				echo "$help_text"
+				return 0
+				;;
+			\?)
+				echo "Invalid option -$OPTARG" >&2
+				return 1
+				;;
+			:)
+				echo "Option -$OPTARG requires an argument" >&2
+				return 1
+				;;
+		esac
+	done
+
+	# A configured alias wins over treating the value as a hostname
+	case "$host" in
+{{- range .Hosts }}
+		{{ .Alias }})
+			host="{{ .Hostname }}"
+			user="{{ .User }}"
+			port="{{ .Port }}"
+{{- if .Key }}
+			keyfile="$(basename "{{ shpath .Key }}")"
+{{- end }}
+			;;
+{{- end }}
+	esac
+
+{{- if .SSH.SubnetPrefix }}
+
+	# A bare number is treated as the last octet of {{ .SSH.SubnetPrefix }}0
+	if [[ "$host" =~ ^[0-9]+$ ]]; then
+		host="{{ .SSH.SubnetPrefix }}$host"
+	fi
+{{- end }}
+
+	if [[ ! -f "$ssh_dir/$keyfile" ]]; then
+		echo "Error: SSH key '$keyfile' not found in $ssh_dir"
+		return 1
+	fi
+
+	ssh -i "$ssh_dir/$keyfile" -p "$port" "$user@$host"
+}

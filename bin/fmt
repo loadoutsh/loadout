@@ -38,9 +38,10 @@ case "${1:-}" in
 		;;
 esac
 
-# Shell files have no extension, so they are matched by path instead.
+# Most shell files here have no extension, so they are matched by path.
 is_shell_path() {
 	case "$1" in
+		*.sh) return 0 ;;
 		.aliases | .aliases.d/* | zsh-functions/* | bin/*) return 0 ;;
 		*) return 1 ;;
 	esac
@@ -60,6 +61,7 @@ fi
 
 shell_files=()
 md_files=()
+go_files=()
 skipped=()
 
 for f in "${candidates[@]}"; do
@@ -74,6 +76,8 @@ for f in "${candidates[@]}"; do
 
 	if [[ "$f" == *.md ]]; then
 		md_files+=("$f")
+	elif [[ "$f" == *.go ]]; then
+		go_files+=("$f")
 	elif is_shell_path "$f" && is_text "$f"; then
 		shell_files+=("$f")
 	fi
@@ -109,12 +113,32 @@ run_prettier() {
 	prettier "${PRETTIER_FLAGS[@]}" --write --log-level warn "${md_files[@]}"
 }
 
+run_gofmt() {
+	((${#go_files[@]})) || return 0
+	if ! command -v gofmt > /dev/null 2>&1; then
+		echo "fmt: gofmt not found, skipping ${#go_files[@]} Go file(s)" >&2
+		return 0
+	fi
+	if [[ "$mode" == "check" ]]; then
+		local unformatted
+		unformatted=$(gofmt -l "${go_files[@]}")
+		if [[ -n "$unformatted" ]]; then
+			echo "$unformatted" | sed 's/^/needs formatting: /'
+			return 1
+		fi
+		return 0
+	fi
+	gofmt -w "${go_files[@]}"
+}
+
 run_shfmt || status=1
 run_prettier || status=1
+run_gofmt || status=1
 
 if [[ "$mode" == "staged" && "$status" -eq 0 ]]; then
 	((${#shell_files[@]})) && git add -- "${shell_files[@]}"
 	((${#md_files[@]})) && git add -- "${md_files[@]}"
+	((${#go_files[@]})) && git add -- "${go_files[@]}"
 fi
 
 if ((${#skipped[@]})); then

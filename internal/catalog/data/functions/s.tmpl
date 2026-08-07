@@ -1,0 +1,22 @@
+# Switch the global git identity and the SSH key that goes with it
+s() {
+	local id="${1:-{{ .DefaultIdentity }}}"
+
+	case "$id" in
+{{- range .Identities }}
+		{{ .ID }})
+			git config --global user.name "{{ .GitUser }}"
+			git config --global user.email "{{ .Email }}"
+			ssh-add -D > /dev/null 2>&1
+			ssh-add "{{ shpath .SSHKey }}"
+			;;
+{{- end }}
+		*)
+			echo "Unknown identity: $id"
+			echo "Known: {{ .IdentityIDs }}"
+			return 1
+			;;
+	esac
+
+	gcfg
+}

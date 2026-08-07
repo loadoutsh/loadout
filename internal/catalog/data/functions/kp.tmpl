@@ -1,0 +1,16 @@
+# Kill the process listening on the given port
+kp() {
+	if [[ -z $1 ]]; then
+		echo 'Please specify port'
+		return 1
+	fi
+
+	local pids
+	pids=$(sudo lsof -t -i:"$1")
+	if [[ -z $pids ]]; then
+		echo "Nothing is listening on port $1"
+		return 1
+	fi
+
+	sudo kill -9 ${=pids}
+}

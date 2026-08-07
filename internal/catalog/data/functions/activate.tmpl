@@ -1,0 +1,14 @@
+# Activate a Python virtual environment
+activate() {
+	if [[ -z $1 ]]; then
+		echo 'Please specify virtual environment'
+		return 1
+	fi
+
+	if [[ -d "{{ shpath .Paths.VenvRoot }}/$1" ]]; then
+		source "{{ shpath .Paths.VenvRoot }}/$1/bin/activate"
+	else
+		echo "Virtual environment $1 does not exist"
+		return 1
+	fi
+}

@@ -1,0 +1,14 @@
+# Navigate to the projects directory, or any path beneath it
+# Example: `p wc/qotm' goes to {{ .Paths.ProjectRoot }}/wc/qotm
+p() {
+	if [[ -z $1 ]]; then
+		cd "{{ shpath .Paths.ProjectRoot }}"
+	else
+		if [[ -e "{{ shpath .Paths.ProjectRoot }}/$1" ]]; then
+			cd "{{ shpath .Paths.ProjectRoot }}/$1"
+		else
+			echo 'Path does not exist'
+			return 1
+		fi
+	fi
+}

@@ -1,0 +1,16 @@
+{{- range .CloneSources }}
+# Clone a repository from the {{ .Org }} organisation using the GitHub CLI
+# Example: `{{ .Alias }} api-starter server' clones {{ .Org }}/api-starter into server
+{{ .Alias }}() {
+	if [[ -z $1 ]]; then
+		echo 'Please provide repo name'
+		return 1
+	fi
+
+	if [[ -z $2 ]]; then
+		gh repo clone "{{ .Org }}/$1"
+	else
+		gh repo clone "{{ .Org }}/$1" "$2"
+	fi
+}
+{{ end -}}

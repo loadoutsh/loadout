@@ -1,0 +1,28 @@
+# Create a Python virtual environment
+venv() {
+	if [[ -z $1 ]]; then
+		echo 'Please specify Python version'
+		return 1
+	fi
+
+	if [[ -z $2 ]]; then
+		echo 'Please provide virtual environment name'
+		return 1
+	fi
+
+	local venv_dir="{{ shpath .Paths.VenvRoot }}/$2"
+
+	if ! command -v "python$1" > /dev/null 2>&1; then
+		echo "Python version $1 is not installed."
+		return 1
+	fi
+
+	if [[ -e $venv_dir ]]; then
+		echo "Virtual environment $2 already exists"
+		return 1
+	fi
+
+	mkdir -p "{{ shpath .Paths.VenvRoot }}"
+	"python$1" -m venv "$venv_dir"
+	echo "Virtual environment $2 created"
+}

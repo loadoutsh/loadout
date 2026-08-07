@@ -1,0 +1,4 @@
+# Install the configured global npm packages
+nig() {
+	npm install -g{{ range .NpmGlobals }} {{ . }}{{ end }}
+}

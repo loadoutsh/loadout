@@ -1,0 +1,16 @@
+# List the available Python virtual environments
+lenv() {
+	local venv_root="{{ shpath .Paths.VenvRoot }}"
+
+	if [[ ! -d $venv_root ]]; then
+		echo "Virtual environment directory does not exist: $venv_root"
+		return 1
+	fi
+
+	local env_dir
+	for env_dir in "$venv_root"/*/; do
+		if [[ -f "$env_dir/bin/activate" ]]; then
+			echo "${env_dir:t} -> $env_dir"
+		fi
+	done
+}

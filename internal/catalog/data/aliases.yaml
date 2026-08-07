@@ -1,0 +1,594 @@
+# Shipped alias catalog. Generated from the original .aliases.d files;
+# command strings are verbatim. Edit here, not there.
+#
+# pack:      empty means a core default, on for everyone
+# platform:  empty means all platforms
+# requires:  binaries that must exist for the alias to work
+aliases:
+  - name: "ctl"
+    platforms:
+      linux: "sudo systemctl"
+      darwin: "sudo launchctl"
+    category: config
+  - name: "ctl:status"
+    platforms:
+      linux: "sudo systemctl status"
+      darwin: "sudo launchctl list"
+    category: config
+  - name: "ctl:start"
+    platforms:
+      linux: "sudo systemctl start"
+      darwin: "sudo launchctl start"
+    category: config
+  - name: "ctl:stop"
+    platforms:
+      linux: "sudo systemctl stop"
+      darwin: "sudo launchctl stop"
+    category: config
+  - name: "ctl:enable"
+    platforms:
+      linux: "sudo systemctl enable"
+      darwin: "sudo launchctl enable"
+    category: config
+  - name: "ctl:disable"
+    platforms:
+      linux: "sudo systemctl disable"
+      darwin: "sudo launchctl disable"
+    category: config
+  - name: "zcon"
+    command: "code ~/.zshrc"
+    category: config
+    requires: ["code"]
+  - name: "zcon:n"
+    command: "nano ~/.zshrc"
+    category: config
+    requires: ["nano"]
+  - name: "omz"
+    command: "code ~/.oh-my-zsh"
+    category: config
+    requires: ["code"]
+    comment: "directory"
+  - name: "zrc"
+    command: ". ~/.zshrc"
+    category: config
+    comment: "refresh/source"
+  - name: "ezrc"
+    command: "exec zsh"
+    category: config
+    comment: "hard refresh"
+  - name: "debi"
+    command: "sudo dpkg -i"
+    category: config
+    platform: [linux]
+    requires: ["dpkg"]
+    comment: "linux"
+  - name: "downloads"
+    command: "cd ~/Downloads"
+    category: config
+  - name: ".."
+    command: "cd .."
+    category: config
+    comment: "one step back"
+  - name: "..."
+    command: "cd ../.."
+    category: config
+    comment: "two steps back"
+  - name: "...."
+    command: "cd ../../../"
+    category: config
+    comment: "three steps back"
+  - name: "cl"
+    command: "clear"
+    category: config
+  - name: "me"
+    command: "whoami"
+    category: config
+  - name: "app"
+    platforms:
+      linux: "sudo apt-get"
+      darwin: "brew"
+    category: config
+  - name: "update"
+    platforms:
+      linux: "sudo apt-get update -y && sudo apt-get upgrade"
+      darwin: "brew update && brew upgrade"
+    category: config
+  - name: "h"
+    command: "history"
+    category: config
+  - name: "date:now"
+    command: "date +\"%T\""
+    category: config
+  - name: "today"
+    command: "date +\"%d-%m-%Y\""
+    category: config
+  - name: "wget"
+    command: "wget -c"
+    category: config
+    requires: ["wget"]
+  - name: "ports"
+    platforms:
+      linux: "netstat -tulanp"
+      darwin: "lsof -i -P"
+    category: config
+  - name: "j"
+    command: "jobs -l"
+    category: config
+  - name: "sa"
+    command: "ssh-add"
+    category: config
+    requires: ["ssh-add"]
+  - name: "sal"
+    command: "ssh-add -l"
+    category: config
+    requires: ["ssh-add"]
+  - name: "cg"
+    command: "gcfg"
+    category: config
+  - name: "vs"
+    command: "code"
+    category: config
+    requires: ["code"]
+  - name: "v"
+    command: "code"
+    category: config
+    requires: ["code"]
+  - name: "v."
+    command: "code ."
+    category: config
+    requires: ["code"]
+  - name: "sshcon"
+    command: "v ~/.ssh/config"
+    category: config
+    requires: ["code"]
+  - name: "dk"
+    command: "docker"
+    category: docker
+    requires: ["docker"]
+  - name: "g:dev"
+    command: "gatsby develop"
+    category: frameworks
+    pack: gatsby
+    requires: ["gatsby"]
+  - name: "g:build"
+    command: "gatsby build"
+    category: frameworks
+    pack: gatsby
+    requires: ["gatsby"]
+  - name: "g:new"
+    command: "gatsby new"
+    category: frameworks
+    pack: gatsby
+    requires: ["gatsby"]
+  - name: "jk"
+    command: "jekyll"
+    category: frameworks
+    pack: jekyll
+    requires: ["jekyll"]
+    comment: "new jekyll site"
+  - name: "jk:new"
+    command: "jekyll new"
+    category: frameworks
+    pack: jekyll
+    requires: ["jekyll"]
+    comment: "new jekyll site"
+  - name: "jk:serve"
+    command: "bundle exec jekyll serve"
+    category: frameworks
+    pack: jekyll
+    requires: ["bundle"]
+    comment: "serve site"
+  - name: "jk:build"
+    command: "bundle exec jekyll build"
+    category: frameworks
+    pack: jekyll
+    requires: ["bundle"]
+    comment: "build site"
+  - name: "jk:page"
+    command: "bundle exec jekyll page"
+    category: frameworks
+    pack: jekyll
+    requires: ["bundle"]
+    comment: "create new page"
+  - name: "jk:post"
+    command: "bundle exec jekyll post"
+    category: frameworks
+    pack: jekyll
+    requires: ["bundle"]
+    comment: "create new post"
+  - name: "xsm"
+    command: "exercism"
+    category: frameworks
+    pack: exercism
+    requires: ["exercism"]
+  - name: "xsm:d"
+    command: "exercism download"
+    category: frameworks
+    pack: exercism
+    requires: ["exercism"]
+  - name: "xsm:s"
+    command: "exercism submit"
+    category: frameworks
+    pack: exercism
+    requires: ["exercism"]
+  - name: "xsm:o"
+    command: "exercism open"
+    category: frameworks
+    pack: exercism
+    requires: ["exercism"]
+  - name: "xsm:v"
+    command: "exercism version"
+    category: frameworks
+    pack: exercism
+    requires: ["exercism"]
+  - name: "fl"
+    command: "flutter"
+    category: frameworks
+    pack: flutter
+    requires: ["flutter"]
+  - name: "fl:h"
+    command: "flutter -h"
+    category: frameworks
+    pack: flutter
+    requires: ["flutter"]
+  - name: "fl:v"
+    command: "flutter -v"
+    category: frameworks
+    pack: flutter
+    requires: ["flutter"]
+  - name: "fl:b"
+    command: "flutter build"
+    category: frameworks
+    pack: flutter
+    requires: ["flutter"]
+  - name: "fl:d"
+    command: "flutter doctor"
+    category: frameworks
+    pack: flutter
+    requires: ["flutter"]
+  - name: "fl:i"
+    command: "flutter install"
+    category: frameworks
+    pack: flutter
+    requires: ["flutter"]
+  - name: "fl:g"
+    command: "flutter generate"
+    category: frameworks
+    pack: flutter
+    requires: ["flutter"]
+  - name: "fl:s"
+    command: "flutter screenshot"
+    category: frameworks
+    pack: flutter
+    requires: ["flutter"]
+  - name: "fl:u"
+    command: "flutter upgrade"
+    category: frameworks
+    pack: flutter
+    requires: ["flutter"]
+  - name: "gpush"
+    command: "git push"
+    category: git
+    requires: ["git"]
+  - name: "gpull"
+    command: "git pull"
+    category: git
+    requires: ["git"]
+  - name: "rnm"
+    command: "git branch -m main"
+    category: git
+    requires: ["git"]
+  - name: "finit"
+    command: "git flow init"
+    category: git
+    pack: git-flow
+    requires: ["git-flow"]
+  - name: "ff"
+    command: "git flow feature"
+    category: git
+    pack: git-flow
+    requires: ["git-flow"]
+  - name: "fr"
+    command: "git flow release"
+    category: git
+    pack: git-flow
+    requires: ["git-flow"]
+  - name: "fh"
+    command: "git flow hotfix"
+    category: git
+    pack: git-flow
+    requires: ["git-flow"]
+  - name: "repo"
+    command: "gh repo"
+    category: git
+    requires: ["gh"]
+  - name: "gist"
+    command: "gh gist"
+    category: git
+    requires: ["gh"]
+  - name: "issue"
+    command: "gh issue"
+    category: git
+    requires: ["gh"]
+  - name: "clone"
+    command: "repo clone"
+    category: git
+    requires: ["gh"]
+  - name: "create"
+    command: "repo create"
+    category: git
+    requires: ["gh"]
+  - name: "fork"
+    command: "repo fork"
+    category: git
+    requires: ["gh"]
+  - name: "view"
+    command: "repo view"
+    category: git
+    requires: ["gh"]
+  - name: "fast"
+    command: "speed-test"
+    category: misc
+    requires: ["speed-test"]
+  - name: "nema"
+    command: "asciinema"
+    category: misc
+    requires: ["asciinema"]
+  - name: "untar"
+    command: "sudo tar -xvzf"
+    category: misc
+    requires: ["tar"]
+  - name: "wch"
+    command: "which"
+    category: misc
+  - name: "wis"
+    command: "whatis"
+    category: misc
+  - name: "rds"
+    command: "redis-cli"
+    category: misc
+    requires: ["redis-cli"]
+  - name: "lh"
+    command: "lighthouse"
+    category: misc
+    requires: ["lighthouse"]
+  - name: "standup"
+    command: "git-standup"
+    category: misc
+    requires: ["git-standup"]
+  - name: "ht"
+    command: "htop"
+    category: misc
+    requires: ["htop"]
+  - name: "py"
+    command: "python"
+    category: misc
+    requires: ["python"]
+  - name: "dev"
+    command: "ts-node-dev --respawn --clear"
+    category: misc
+    requires: ["ts-node-dev"]
+  - name: "mip"
+    platforms:
+      linux: "dig +short myip.opendns.com @resolver1.opendns.com | xsel -i -b"
+      darwin: "dig +short myip.opendns.com @resolver1.opendns.com | pbcopy"
+    category: misc
+  - name: "rw"
+    command: "railway"
+    category: misc
+    requires: ["railway"]
+  - name: "cf"
+    command: "cloudflared"
+    category: misc
+    pack: cloudflared
+    requires: ["cloudflared"]
+  - name: "cft"
+    command: "cloudflared tunnel"
+    category: misc
+    pack: cloudflared
+    requires: ["cloudflared"]
+  - name: "cftr"
+    command: "cloudflared tunnel run"
+    category: misc
+    pack: cloudflared
+    requires: ["cloudflared"]
+  - name: "hr"
+    command: "heroku"
+    category: misc
+    requires: ["heroku"]
+  - name: "hr:l"
+    command: "heroku logs --tail"
+    category: misc
+    requires: ["heroku"]
+  - name: "db"
+    command: "dbdocs"
+    category: misc
+    requires: ["dbdocs"]
+  - name: "ans"
+    command: "ansible"
+    category: misc
+    pack: ansible
+    requires: ["ansible"]
+  - name: "sans"
+    command: "ans --become --ask-become-pass"
+    category: misc
+    pack: ansible
+    requires: ["ansible"]
+  - name: "ansp"
+    command: "ansible-playbook"
+    category: misc
+    pack: ansible
+    requires: ["ansible"]
+  - name: "sansp"
+    command: "ansible-playbook --ask-become-pass"
+    category: misc
+    pack: ansible
+    requires: ["ansible"]
+  - name: "inf"
+    command: "infisical"
+    category: misc
+    requires: ["infisical"]
+  - name: "n"
+    command: "npm"
+    category: npm
+    requires: ["npm"]
+  - name: "ni"
+    command: "npm install"
+    category: npm
+    requires: ["npm"]
+  - name: "nu"
+    command: "npm uninstall"
+    category: npm
+    requires: ["npm"]
+  - name: "ns"
+    command: "npm start"
+    category: npm
+    requires: ["npm"]
+  - name: "nr"
+    command: "npm run"
+    category: npm
+    requires: ["npm"]
+  - name: "nb"
+    command: "npm run build"
+    category: npm
+    requires: ["npm"]
+  - name: "nd"
+    command: "npm run dev"
+    category: npm
+    requires: ["npm"]
+  - name: "cna"
+    command: "npx create-next-app"
+    category: npm
+    requires: ["npx"]
+  - name: "cnat"
+    command: "npx create-next-app --example with-typescript"
+    category: npm
+    requires: ["npx"]
+  - name: "y"
+    command: "yarn"
+    category: npm
+    requires: ["yarn"]
+  - name: "ys"
+    command: "yarn start"
+    category: npm
+    requires: ["yarn"]
+  - name: "ya"
+    command: "yarn add"
+    category: npm
+    requires: ["yarn"]
+  - name: "yr"
+    command: "yarn remove"
+    category: npm
+    requires: ["yarn"]
+  - name: "yb"
+    command: "yarn build"
+    category: npm
+    requires: ["yarn"]
+  - name: "yd"
+    command: "yarn dev"
+    category: npm
+    requires: ["yarn"]
+  - name: "yt"
+    command: "yarn test"
+    category: npm
+    requires: ["yarn"]
+  - name: "yte"
+    command: "yarn test:e2e"
+    category: npm
+    requires: ["yarn"]
+  - name: "ycna"
+    command: "yarn create next-app"
+    category: npm
+    requires: ["yarn"]
+  - name: "ycnae"
+    command: "yarn create next-app --example"
+    category: npm
+    requires: ["yarn"]
+  - name: "ycnat"
+    command: "yarn create next-app --example with-typescript"
+    category: npm
+    requires: ["yarn"]
+  - name: "b"
+    command: "bun"
+    category: npm
+    requires: ["bun"]
+  - name: "ba"
+    command: "bun add"
+    category: npm
+    requires: ["bun"]
+  - name: "bi"
+    command: "bun install"
+    category: npm
+    requires: ["bun"]
+  - name: "br"
+    command: "bun run"
+    category: npm
+    requires: ["bun"]
+  - name: "bs"
+    command: "bun start"
+    category: npm
+    requires: ["bun"]
+  - name: "bd"
+    command: "bun dev"
+    category: npm
+    requires: ["bun"]
+  - name: "bt"
+    command: "bun test"
+    category: npm
+    requires: ["bun"]
+  - name: "bx"
+    command: "bunx"
+    category: npm
+    requires: ["bunx"]
+  - name: "oc"
+    command: "opencode"
+    category: npm
+    requires: ["opencode"]
+  - name: "t"
+    command: "tmux"
+    category: tmux
+    requires: ["tmux"]
+  - name: "tl"
+    command: "t ls"
+    category: tmux
+    requires: ["tmux"]
+  - name: "tn"
+    command: "t new -s"
+    category: tmux
+    requires: ["tmux"]
+  - name: "td"
+    command: "t detach"
+    category: tmux
+    requires: ["tmux"]
+  - name: "ta"
+    command: "t attach -t"
+    category: tmux
+    requires: ["tmux"]
+  - name: "tksv"
+    command: "t kill-server"
+    category: tmux
+    requires: ["tmux"]
+  - name: "tkss"
+    command: "t kill-session"
+    category: tmux
+    requires: ["tmux"]
+  - name: "tkp"
+    command: "t kill-pane"
+    category: tmux
+    requires: ["tmux"]
+  - name: "tkw"
+    command: "t kill-window"
+    category: tmux
+    requires: ["tmux"]
+  - name: "tsrc"
+    command: "t source-file ./.tmux.conf"
+    category: tmux
+    requires: ["tmux"]
+  - name: "tss"
+    command: "tmux-session save"
+    category: tmux
+    requires: ["tmux"]
+  - name: "tsr"
+    command: "tmux-session restore"
+    category: tmux
+    requires: ["tmux"]

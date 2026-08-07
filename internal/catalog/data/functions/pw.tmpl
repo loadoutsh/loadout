@@ -1,0 +1,24 @@
+# Open a configured editor workspace
+pw() {
+	if [[ -z $1 ]]; then
+		echo 'Workspace name required'
+		return 1
+	fi
+
+	# Keys stay quoted. Unquoted, shfmt reads an array subscript as arithmetic
+	# and rewrites a key like [a11-wb] into [a11 - wb], breaking the lookup.
+	local -A workspaces=(
+{{- range .Workspaces }}
+		["{{ .Name }}"]="{{ shpath .Path }}"
+{{- end }}
+	)
+
+	if [[ -n "${workspaces[$1]}" ]]; then
+		{{ .Editor }} "${workspaces[$1]}"
+	elif [[ -e "{{ shpath .Paths.ProjectRoot }}/$1" ]]; then
+		{{ .Editor }} "{{ shpath .Paths.ProjectRoot }}/$1"
+	else
+		echo 'Path or workspace does not exist'
+		return 1
+	fi
+}

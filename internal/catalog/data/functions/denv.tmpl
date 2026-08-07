@@ -1,0 +1,15 @@
+# Delete a Python virtual environment
+denv() {
+	if [[ -z $1 ]]; then
+		echo 'Please specify virtual environment'
+		return 1
+	fi
+
+	if [[ -d "{{ shpath .Paths.VenvRoot }}/$1" ]]; then
+		rm -rf "{{ shpath .Paths.VenvRoot }}/$1"
+		echo "Virtual environment $1 deleted"
+	else
+		echo "Virtual environment $1 does not exist"
+		return 1
+	fi
+}

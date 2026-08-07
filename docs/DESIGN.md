@@ -2,7 +2,7 @@
 
 Turning this personal dotfiles repo into an installable CLI application for Linux and macOS, with a local web UI for managing it.
 
-Status: **draft, pre-implementation.** Open questions are collected at the end.
+Status: **Phase 0 complete.** Open questions are collected at the end.
 
 ## What we are building
 
@@ -50,18 +50,22 @@ Nothing personal is committed to this repo after the restructure.
 
 ## Repo layout
 
+Built so far marked with a tick.
+
 ```
-cmd/loadout/          entry point
+cmd/loadout/           entry point, cobra commands          ✓
 internal/
-  config/              schema, load, validate, migrate
-  generate/            shell generation
-    backend/           ShellBackend interface; zsh implementation
-  catalog/             the curated alias + function set (embedded)
+  config/              schema, load, merge, validate        ✓
+  catalog/             curated set, embedded                ✓
+    data/aliases.yaml    136 shipped aliases                ✓
+    data/functions/      14 function templates              ✓
+  generate/            rendering                            ✓
+    backend/           Backend interface; zsh               ✓
   credentials/         keychain abstraction
-  requires/            capability checks driving doctor + UI status
+  requires/            capability checks for doctor and UI
   server/              localhost web UI
 web/                   UI source, built and embedded
-templates/             alias + function templates
+testdata/parity/       fixture config + verify.sh           ✓
 docs/
 ```
 

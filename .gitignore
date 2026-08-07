@@ -4,3 +4,6 @@
 # platform rather than artifacts committed to the repo. See docs/DESIGN.md.
 bin/duckdb
 bin/ngrok
+
+# Built binary
+/loadout

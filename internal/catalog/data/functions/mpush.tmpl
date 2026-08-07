@@ -1,0 +1,33 @@
+# Upload a file to a configured remote host over scp
+mpush() {
+	if [[ -z $1 || -z $2 ]]; then
+		echo "Usage: mpush <host> <file> [remote_path]"
+		echo "Hosts: {{ .HostAliases }}"
+		return 1
+	fi
+
+	if [[ ! -f $2 ]]; then
+		echo "File '$2' does not exist or is not a regular file."
+		return 1
+	fi
+
+	local host user key port upload_path
+	case "$1" in
+{{- range .Hosts }}
+		{{ .Alias }})
+			host="{{ .Hostname }}"
+			user="{{ .User }}"
+			key="{{ shpath .Key }}"
+			port="{{ .Port }}"
+			upload_path="{{ .UploadPath }}"
+			;;
+{{- end }}
+		*)
+			echo "Unknown host: $1"
+			echo "Hosts: {{ .HostAliases }}"
+			return 1
+			;;
+	esac
+
+	scp -i "$key" -P "$port" "$2" "$user@$host:${3:-$upload_path}/$(basename "$2")"
+}
