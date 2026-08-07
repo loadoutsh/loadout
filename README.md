@@ -215,9 +215,16 @@ and the right command for both.
 make check     # build, vet, test, format
 make golden    # re-record the golden files after an intended change
 make release   # cross-compile every platform into dist/ with checksums
+make tap       # render the Homebrew formula from those checksums
 ```
 
 The generated shell is pinned by golden files in `testdata/golden`, covering both shells and both platforms. A change to the catalog or a template shows up as a diff there, which is what you review.
+
+### Releasing
+
+Pushing a `v*` tag runs the release workflow: it tests, cross-compiles all four platforms, publishes a GitHub release with the tarballs and `checksums.txt`, renders the Homebrew formula from those checksums, and commits it to the tap.
+
+The tap push needs a `TAP_GITHUB_TOKEN` secret with write access to `loadoutsh/homebrew-loadout`. Without one the release still publishes and the workflow warns instead of failing, since a missing tap update should not block the release everyone else installs from. Publish `dist/loadout.rb` by hand in that case: a tap left behind keeps serving the old version, and `brew upgrade` will report there is nothing to do.
 
 ## Licence
 

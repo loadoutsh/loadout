@@ -1,0 +1,72 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    # Job level, because a step's own env block is not visible to that step's
+    # own if condition.
+    env:
+      TAP_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      # Publishing a broken build is worse than publishing late.
+      - name: Test before building anything
+        run: |
+          go vet ./...
+          go test ./...
+
+      - name: Build every platform
+        run: make release VERSION=${{ github.ref_name }}
+
+      - name: Render the Homebrew formula
+        run: make tap VERSION=${{ github.ref_name }}
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "${{ github.ref_name }}" \
+            --generate-notes \
+            dist/*.tar.gz dist/checksums.txt
+
+      # A tap that is not updated keeps installing the previous version
+      # forever, and brew will report that everything is up to date. Skipped
+      # rather than failed when no token is configured, so the GitHub release
+      # still publishes.
+      - name: Update the Homebrew tap
+        if: ${{ env.TAP_TOKEN != '' }}
+        run: |
+          git clone "https://x-access-token:${TAP_TOKEN}@github.com/loadoutsh/homebrew-loadout.git" tap
+          mkdir -p tap/Formula
+          cp dist/loadout.rb tap/Formula/loadout.rb
+          cd tap
+          git config user.name "loadout release"
+          git config user.email "noreply@github.com"
+          git add Formula/loadout.rb
+          if git diff --cached --quiet; then
+            echo "formula unchanged"
+            exit 0
+          fi
+          git commit -m "loadout ${{ github.ref_name }}"
+          git push
+
+      - name: Note when the tap was skipped
+        if: ${{ env.TAP_TOKEN == '' }}
+        run: |
+          echo "::warning::TAP_GITHUB_TOKEN is not set, so the Homebrew tap was not updated."
+          echo "Publish dist/loadout.rb to loadoutsh/homebrew-loadout by hand,"
+          echo "or brew users will keep installing the previous version."

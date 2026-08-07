@@ -66,6 +66,14 @@ release: ## Cross-compile every platform into ./dist with checksums
 	@echo
 	@cat $(DIST)/checksums.txt
 
+.PHONY: tap
+tap: ## Render the Homebrew formula from dist/checksums.txt into dist/loadout.rb
+	@packaging/homebrew/generate.sh $(VERSION) > $(DIST)/loadout.rb
+	@ruby -c $(DIST)/loadout.rb > /dev/null 2>&1 && echo "  formula is valid ruby" || \
+		echo "  (ruby not available, formula not syntax-checked)"
+	@echo "  wrote $(DIST)/loadout.rb for $(VERSION)"
+	@echo "  publish to loadoutsh/homebrew-loadout as Formula/loadout.rb"
+
 .PHONY: clean
 clean: ## Remove build artefacts
 	rm -rf $(DIST) $(BINARY)
