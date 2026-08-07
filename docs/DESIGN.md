@@ -2,7 +2,7 @@
 
 Turning this personal dotfiles repo into an installable CLI application for Linux and macOS, with a local web UI for managing it.
 
-Status: **Phases 0 to 4 complete.** Open questions are collected at the end.
+Status: **Phases 0 to 5 complete.** Open questions are collected at the end.
 
 ## What we are building
 
@@ -66,6 +66,7 @@ internal/
   requires/            capability checks for doctor and describe    ✓
   server/              localhost web UI + its security            ✓
     web/               embedded page, no build step                ✓
+  sync/                git-backed config repo + secret scan         ✓
 testdata/parity/       fixture config + verify.sh           ✓
 docs/
 ```
@@ -208,13 +209,19 @@ Anything installed here lands on `PATH` and will be executed, so this is the one
 
 Config is text and syncs trivially. Credentials do not sync at all: a keychain is per-machine and deliberately non-exportable. So this splits into two problems with different answers.
 
-**Config** syncs through a git-backed private repo the tool drives.
+**Config** syncs through a git-backed private repo the tool drives. It shells out to `git`, so existing SSH keys and credential helpers work unchanged.
 
 ```sh
 loadout sync init git@github.com:user/loadout-config.git
+loadout sync status    # exactly which files would leave the machine
 loadout sync push
 loadout sync pull
+loadout scan           # check for credentials without touching git
 ```
+
+Only `config.yaml` is tracked. `init.*` is generated and would conflict on every machine; `local.yaml` is the machine-specific overlay and exists precisely to stay put.
+
+A scanner runs **before the commit**, not before the push, so a credential pasted into the config never enters the history at all — once committed, removing it needs a rewrite. It matches high-signal shapes (`ghp_`, `npm_`, `AKIA`, JWTs, PEM blocks, literal `password:` fields) rather than guessing at entropy, which would fire constantly on hostnames and paths. `password: cred:<name>` is the correct form and is explicitly allowed.
 
 **Credentials** get one of three treatments, and the choice is the user's:
 
