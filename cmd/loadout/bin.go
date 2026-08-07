@@ -8,9 +8,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/wesscoby/loadout/internal/binaries"
-	"github.com/wesscoby/loadout/internal/catalog"
-	"github.com/wesscoby/loadout/internal/config"
+	"github.com/loadoutsh/loadout/internal/binaries"
+	"github.com/loadoutsh/loadout/internal/catalog"
+	"github.com/loadoutsh/loadout/internal/config"
 )
 
 func newBinCmd() *cobra.Command {

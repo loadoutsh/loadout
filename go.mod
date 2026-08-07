@@ -1,4 +1,4 @@
-module github.com/wesscoby/loadout
+module github.com/loadoutsh/loadout
 
 go 1.26.5
 

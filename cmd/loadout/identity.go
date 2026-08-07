@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/wesscoby/loadout/internal/config"
+	"github.com/loadoutsh/loadout/internal/config"
 )
 
 func newIdentityCmd() *cobra.Command {

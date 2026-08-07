@@ -2,14 +2,14 @@
 #
 # loadout installer.
 #
-#   curl -fsSL https://raw.githubusercontent.com/wesscoby/loadout/main/install.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/loadoutsh/loadout/main/install.sh | sh
 #
 # POSIX sh, because the shell running this is whatever the user happens to
 # have, which on a minimal server may not be bash.
 
 set -eu
 
-REPO="wesscoby/loadout"
+REPO="loadoutsh/loadout"
 BINARY="loadout"
 INSTALL_DIR="${LOADOUT_INSTALL_DIR:-$HOME/.local/bin}"
 VERSION="${LOADOUT_VERSION:-latest}"

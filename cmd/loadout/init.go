@@ -11,9 +11,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/wesscoby/loadout/internal/catalog"
-	"github.com/wesscoby/loadout/internal/config"
-	"github.com/wesscoby/loadout/internal/generate"
+	"github.com/loadoutsh/loadout/internal/catalog"
+	"github.com/loadoutsh/loadout/internal/config"
+	"github.com/loadoutsh/loadout/internal/generate"
 )
 
 func newInitCmd() *cobra.Command {

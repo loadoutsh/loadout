@@ -7,9 +7,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/wesscoby/loadout/internal/catalog"
-	"github.com/wesscoby/loadout/internal/config"
-	"github.com/wesscoby/loadout/internal/requires"
+	"github.com/loadoutsh/loadout/internal/catalog"
+	"github.com/loadoutsh/loadout/internal/config"
+	"github.com/loadoutsh/loadout/internal/requires"
 )
 
 func newDescribeCmd() *cobra.Command {

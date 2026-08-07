@@ -11,8 +11,8 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 
-	"github.com/wesscoby/loadout/internal/config"
-	"github.com/wesscoby/loadout/internal/credentials"
+	"github.com/loadoutsh/loadout/internal/config"
+	"github.com/loadoutsh/loadout/internal/credentials"
 )
 
 func newCredCmd() *cobra.Command {

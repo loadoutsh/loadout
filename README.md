@@ -9,20 +9,20 @@ Linux and macOS. zsh and bash.
 ## Install
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/wesscoby/loadout/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/loadoutsh/loadout/main/install.sh | sh
 ```
 
 Or with Homebrew:
 
 ```sh
-brew tap wesscoby/loadout
+brew tap loadoutsh/loadout
 brew install loadout
 ```
 
 Or from source, if you have Go:
 
 ```sh
-go install github.com/wesscoby/loadout/cmd/loadout@latest
+go install github.com/loadoutsh/loadout/cmd/loadout@latest
 ```
 
 ## Getting started

@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wesscoby/loadout/internal/config"
+	"github.com/loadoutsh/loadout/internal/config"
 )
 
 // maxDownloadSize caps a single download.

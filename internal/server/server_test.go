@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/wesscoby/loadout/internal/catalog"
+	"github.com/loadoutsh/loadout/internal/catalog"
 )
 
 // start brings up a real server on a free loopback port against a temporary

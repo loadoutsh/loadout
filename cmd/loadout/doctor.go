@@ -11,11 +11,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/wesscoby/loadout/internal/catalog"
-	"github.com/wesscoby/loadout/internal/config"
-	"github.com/wesscoby/loadout/internal/credentials"
-	"github.com/wesscoby/loadout/internal/generate"
-	"github.com/wesscoby/loadout/internal/requires"
+	"github.com/loadoutsh/loadout/internal/catalog"
+	"github.com/loadoutsh/loadout/internal/config"
+	"github.com/loadoutsh/loadout/internal/credentials"
+	"github.com/loadoutsh/loadout/internal/generate"
+	"github.com/loadoutsh/loadout/internal/requires"
 )
 
 // severity of one finding.

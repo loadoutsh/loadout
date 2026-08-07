@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/wesscoby/loadout/internal/catalog"
-	"github.com/wesscoby/loadout/internal/config"
+	"github.com/loadoutsh/loadout/internal/catalog"
+	"github.com/loadoutsh/loadout/internal/config"
 
 	"gopkg.in/yaml.v3"
 )

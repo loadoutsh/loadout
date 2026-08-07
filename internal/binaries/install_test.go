@@ -16,7 +16,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/wesscoby/loadout/internal/config"
+	"github.com/loadoutsh/loadout/internal/config"
 )
 
 const payload = "#!/bin/sh\necho hello from the test binary\n"
