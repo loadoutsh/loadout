@@ -1,0 +1,68 @@
+#!/bin/bash
+
+# Title       : csf
+# Date        : 17.05.2019
+# Author      : WessCoby
+# Version     : 1.0.0
+# Description : Short for 'Create Script File' [A simple bash script creator]
+#               Creates a new bash script file in the current working directory.
+#               This kind of solves the CR [Carriage Return (\r)]
+#               and LF [Linefeed (\n)] issue in Windows, since the file
+#               will be created in a Unix environment, and not Windows.
+#               Therefore, after creating the script file, just open it
+#               in your editor and start writing your script
+# Options     : Specify file name [you can choose to add a bash extension]
+
+#---------------------------------------------------------------------
+#                                FUNCTIONS
+#---------------------------------------------------------------------
+
+### Prompt for file name
+prompt() {
+	read -r -p "File name(s) [Space or comma separated]: " file
+	echo "$file"
+}
+
+### Create a script file with argument as name,
+### set execute permissions
+### and add brief documentation
+createScriptFile() {
+	if [[ ! -e "$PWD/$1" ]]; then
+		touch "$PWD/$1" # Create file
+		chmod u+x ${1}  # Modify the file's permission
+
+		# Adding some content to the newly created file
+		printf "%s\n\n" "#!/bin/bash" > ${1} # shebang!
+
+		# A brief documentation
+		printf "#: Title:           %s\n" "$1" | cat >> $1
+		printf "#: Date:            %s\n" "$(date)" | cat >> $1
+		printf "#: Author:          %s\n" "[Your name]" | cat >> $1
+		printf "#: Version:         %s\n" "1.0.0" | cat >> $1
+		printf "#: Description:     %s\n\n" "[A brief description of your script's functionality]" | cat >> $1
+		printf "# Begin Scripting " | cat >> $1
+	fi
+}
+
+#---------------------------------------------------------------------
+#                                 START
+#---------------------------------------------------------------------
+
+### If no argument is passed when script is invoked
+if [[ $# == 0 ]]; then
+	# Prompt for file name(s) and save input in array (names)
+	IFS=', ' read -r -a names <<< $(prompt)
+	for name in "${names[@]}"; do
+		createScriptFile ${name}
+	done
+	exit 0
+elif [[ $# == 1 ]]; then # if script is invoked with 1 argument
+	createScriptFile $1
+	exit 0
+else # if 2 or more arguments
+	IFS=', ' read -r -a filenames <<< $@
+	for file in "${filenames[@]}"; do
+		createScriptFile "$file"
+	done
+	exit 0
+fi

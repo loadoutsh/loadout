@@ -137,6 +137,20 @@ binaries:
       asset:
         linux-amd64: duckdb_cli-linux-amd64.zip
         darwin-arm64: duckdb_cli-osx-universal.zip
+    # Verified against the real v1.1.3 linux-amd64 asset. A checksum only
+    # covers the platform it was taken from, so darwin needs its own entry
+    # before it can be verified there.
+    checksum: sha256:efd0fccdb1a28d9ec7a6ebfcde59900068b8ba43a846c9b553c0fd2bbe4acf43
+
+# The scripts the original bin/ directory put on PATH. bin/fmt is absent
+# deliberately: it is dev tooling for this repo, not something loadout ships.
+scripts:
+  - name: csf
+    source: builtin
+  - name: sshp
+    source: builtin
+  - name: tmux-session
+    source: builtin
 
 # Everything the original environment had switched on.
 packs: [gatsby, jekyll, flutter, exercism, git-flow, cloudflared, ansible]

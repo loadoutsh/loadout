@@ -76,6 +76,30 @@ Nothing outside ~/.config/loadout is touched.`,
 			}
 
 			cmd.Printf("wrote %s\n", path)
+
+			// Scripts are text and idempotent, so apply keeps them current.
+			// Binaries are not: fetching them is slow and needs the network,
+			// so that stays an explicit 'loadout bin install'.
+			if len(cfg.Scripts) > 0 {
+				inst, err := installer()
+				if err != nil {
+					return err
+				}
+				lookup, err := builtinLookup()
+				if err != nil {
+					return err
+				}
+				results := inst.InstallScripts(cfg.Scripts, lookup)
+				for _, r := range results {
+					if r.Err != nil {
+						cmd.PrintErrf("script %s: %v\n", r.Name, r.Err)
+					}
+				}
+				if changed := scriptNames(results); changed != "" {
+					cmd.Printf("installed scripts: %s\n", changed)
+				}
+			}
+
 			cmd.Printf("add this to your shell config if it is not there yet:\n\n  source %s\n", path)
 			return nil
 		},

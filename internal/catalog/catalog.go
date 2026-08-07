@@ -14,6 +14,7 @@ import (
 //go:embed data/aliases.yaml
 //go:embed data/functions.yaml
 //go:embed data/functions/*.tmpl
+//go:embed data/scripts/*
 var files embed.FS
 
 // Alias is one shipped alias.

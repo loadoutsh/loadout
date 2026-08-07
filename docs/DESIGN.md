@@ -2,7 +2,7 @@
 
 Turning this personal dotfiles repo into an installable CLI application for Linux and macOS, with a local web UI for managing it.
 
-Status: **Phases 0 and 1 complete.** Open questions are collected at the end.
+Status: **Phases 0 to 2 complete.** Open questions are collected at the end.
 
 ## What we are building
 
@@ -61,6 +61,7 @@ internal/
     data/functions/      14 function templates              ✓
   generate/            rendering                            ✓
     backend/           Backend interface; zsh               ✓
+  binaries/            fetch, verify, extract, install, state       ✓
   credentials/         keychain abstraction
   requires/            capability checks for doctor and describe    ✓
   server/              localhost web UI
@@ -181,7 +182,13 @@ Install target is `~/.local/share/loadout/bin`, added to `PATH` by the generated
 
 Two things this earns beyond tidiness. Version drift becomes visible: the committed ngrok is from March 2023 and duckdb from November 2023, and neither announces itself as stale. And it gives macOS support somewhere to live, since the same declaration resolves to a different asset per platform.
 
-Anything installed here lands on `PATH` and will be executed, so fetches verify a checksum where the source publishes one, and the UI shows provenance per binary. Worth being deliberate about: this is the one feature that downloads and runs code.
+Anything installed here lands on `PATH` and will be executed, so this is the one feature that downloads and runs code. What that means in practice:
+
+- HTTPS only, **including every redirect hop**. Checking just the configured URL is not enough, because release hosts redirect to a CDN.
+- A declared checksum is verified before anything is installed, and `bin list` says plainly whether each binary was verified or merely downloaded.
+- Archive members with absolute or `..` paths are refused, and extraction is size-capped.
+- Writes go to a temporary file and are renamed into place, so an interrupted install cannot leave a half-written executable on PATH.
+- Provenance is recorded: `bin list` shows the exact URL each binary came from.
 
 ## Sync
 
