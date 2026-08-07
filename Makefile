@@ -41,14 +41,10 @@ check: ## Everything CI would run
 	./bin/fmt --check
 	@echo "all checks passed"
 
-.PHONY: parity
-parity: build ## Prove the generator still reproduces the original shell files
-	@tmp=$$(mktemp -d); \
-	mkdir -p $$tmp/xdg/loadout; \
-	cp testdata/parity/config.yaml $$tmp/xdg/loadout/config.yaml; \
-	XDG_CONFIG_HOME=$$tmp/xdg ./$(BINARY) apply --platform linux >/dev/null; \
-	./testdata/parity/verify.sh $$tmp; \
-	rm -rf $$tmp
+.PHONY: golden
+golden: ## Re-record the golden files after an intended change
+	go test ./internal/generate -update
+	@echo "review the diff in testdata/golden before committing"
 
 .PHONY: release
 release: ## Cross-compile every platform into ./dist with checksums

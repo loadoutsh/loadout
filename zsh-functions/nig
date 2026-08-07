@@ -1,4 +1,0 @@
-# Install global npm packages
-nig() {
-	npm install -g qotm @nestjs/cli pm2 serve ts-node-dev npm-check-updates degit corepack dbdocs @infisical/cli prettier
-}

@@ -1,8 +1,0 @@
-# Kill the process running on the specified port
-kp() {
-	if [[ -z $1 ]]; then
-		echo 'Please specify port'
-	else
-		sudo kill -9 $(sudo lsof -t -i:$1)
-	fi
-}

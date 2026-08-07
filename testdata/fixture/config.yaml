@@ -1,10 +1,11 @@
-# Parity fixture: the configuration that reproduces the pre-loadout shell
-# environment. Used by the parity test to prove the generator emits the same
-# aliases the hand-written .aliases.d files did.
+# Test fixture: a configuration exercising every section of the schema.
 #
-# Emails and hostnames here are placeholders. The originals came from an
-# untracked .env; moving them into config is the point of the migration, so
-# they are deliberately not real values.
+# The golden test renders this for both shells and both platforms, so any
+# change to the catalog or a template shows up as a diff in testdata/golden.
+# Keep it broad rather than tidy: a section not represented here is a section
+# no test covers.
+#
+# Emails, hostnames and paths are illustrative, not real.
 version: 1
 
 paths:
@@ -16,7 +17,7 @@ git:
   dev_branch: development
 
 ssh:
-  default_key: sucasa
+  default_key: box-b
   default_user: root
   default_host: 10.0.0.2
   default_port: 22
@@ -26,12 +27,12 @@ editors:
   - name: code
     command: code
   - name: ut
-    command: /home/wc/.vscode-portable/utopia/VSCode-linux-x64/bin/code
+    command: /opt/vscode-portable/bin/code
 
 node_versions: ["16", "18", "20", "22", "24"]
 
 npm_globals:
-  - qotm
+  - tldr
   - "@nestjs/cli"
   - pm2
   - serve
@@ -56,26 +57,26 @@ credentials:
 
 identities:
   - id: default
-    git_user: WessCoby
+    git_user: Example User
     email: default@example.com
     ssh_key: ~/.ssh/id_rsa
     default: true
   - id: gp
-    git_user: GP
+    git_user: Example Two
     email: gp@example.com
-    ssh_key: ~/.ssh/gp_id_rsa
+    ssh_key: ~/.ssh/id_two
   - id: ut
-    git_user: Emmanuel Sekyere
+    git_user: Example Three
     email: ut@example.com
-    ssh_key: ~/.ssh/ut_es_ed
+    ssh_key: ~/.ssh/id_three
   - id: fin
-    git_user: Emmanuel Sekyere
+    git_user: Example Three
     email: fin@example.com
-    ssh_key: ~/.ssh/fin_es_ed
-  - id: wc
-    git_user: Wess
-    email: wc@example.com
-    ssh_key: ~/.ssh/wc_ed
+    ssh_key: ~/.ssh/id_four
+  - id: five
+    git_user: Example Four
+    email: five@example.com
+    ssh_key: ~/.ssh/id_five
     # Switching to this identity also swaps these credential entries, so one
     # command changes git author, SSH key and tokens together.
     activates:
@@ -83,25 +84,24 @@ identities:
       gh_token: work
 
 hosts:
-  # Shortcut hosts: these also emit a bare `ssh <alias>` alias, matching the
-  # micasa/sucasa/micaddy/sucaddy aliases from config.aliases.
-  - alias: micasa
-    hostname: micasa
+  # Shortcut hosts also emit a bare `ssh <alias>` alias.
+  - alias: box-a
+    hostname: box-a
     user: root
     shortcut: true
-  - alias: sucasa
-    hostname: sucasa
+  - alias: box-b
+    hostname: box-b
     user: root
     shortcut: true
-  - alias: micaddy
-    hostname: micaddy
+  - alias: edge-a
+    hostname: edge-a
     user: root
     shortcut: true
-  - alias: sucaddy
-    hostname: sucaddy
+  - alias: edge-b
+    hostname: edge-b
     user: root
     shortcut: true
-  # Upload targets, previously the *_MACHINE variables read by mpush.
+  # Upload targets for mpush.
   - alias: api
     hostname: api.example.internal
     user: azureuser
@@ -129,21 +129,21 @@ hosts:
     upload_path: ~
 
 workspaces:
-  - name: a11
-    path: ~/Projects/acme/api/api.code-workspace
-    tmux_session: a11
-  - name: a11-wb
-    path: ~/Projects/svt/acme/wb/a11-wb.code-workspace
-    tmux_session: a11-wb
-  - name: inerds
-    path: ~/Projects/inerds/web/inerds.code-workspace
-    tmux_session: inerds
-  - name: snipify
-    path: ~/Projects/wt/snipify/snipify.code-workspace
+  - name: api
+    path: ~/Projects/api/api.code-workspace
+    tmux_session: api
+  - name: api-web
+    path: ~/Projects/api-web/api-web.code-workspace
+    tmux_session: api-web
+  - name: docs
+    path: ~/Projects/docs/docs.code-workspace
+    tmux_session: docs
+  - name: tools
+    path: ~/Projects/tools/tools.code-workspace
 
 clone_sources:
-  - alias: wt
-    org: wesnetech
+  - alias: clone-eg
+    org: example-org
 
 binaries:
   - name: duckdb
@@ -180,10 +180,10 @@ aliases:
     - name: dns
       command: cloudflared tunnel route dns dev
     - name: vpn-up
-      command: sudo wg-quick up ut
+      command: sudo wg-quick up office
       platform: [linux]
     - name: vpn-down
-      command: sudo wg-quick down ut
+      command: sudo wg-quick down office
       platform: [linux]
     - name: vup
       command: vpn-up
@@ -193,16 +193,16 @@ aliases:
       command: openvpn3
       platform: [linux]
     - name: ovi
-      command: ov config-import --config /home/wc/Projects/svt/utopia/misc/openvpn/v_dev_pt_56.ovpn --name ut --tag utopia
+      command: ov config-import --config /opt/vpn/office.ovpn --name office --tag work
       platform: [linux]
     - name: ovl
       command: ov configs-list
       platform: [linux]
     - name: ovc
-      command: ov session-start -c ut
+      command: ov session-start -c office
       platform: [linux]
     - name: ovd
-      command: ov session-manage --disconnect -c ut
+      command: ov session-manage --disconnect -c office
       platform: [linux]
     - name: "xsm:cd"
-      command: cd /home/wc/snap/exercism/5/exercism
+      command: cd $HOME/snap/exercism/current

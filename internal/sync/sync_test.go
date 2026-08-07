@@ -40,7 +40,7 @@ paths:
   project_root: ~/Projects
   venv_root: ~/.venv
 ssh:
-  default_key: sucasa
+  default_key: deploy
   default_user: root
   subnet_prefix: "10.0.0."
 credentials:

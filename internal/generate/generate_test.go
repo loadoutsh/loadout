@@ -16,7 +16,7 @@ import (
 // that predates loadout.
 func loadFixture(t *testing.T) *config.Config {
 	t.Helper()
-	path := filepath.Join("..", "..", "testdata", "parity", "config.yaml")
+	path := filepath.Join("..", "..", "testdata", "fixture", "config.yaml")
 	data, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("reading fixture: %v", err)
@@ -30,12 +30,18 @@ func loadFixture(t *testing.T) *config.Config {
 	return &cfg
 }
 
-func render(t *testing.T, cfg *config.Config, goos string) string {
+func mustCatalog(t *testing.T) *catalog.Catalog {
 	t.Helper()
 	cat, err := catalog.Load()
 	if err != nil {
 		t.Fatalf("loading catalog: %v", err)
 	}
+	return cat
+}
+
+func render(t *testing.T, cfg *config.Config, goos string) string {
+	t.Helper()
+	cat := mustCatalog(t)
 	g, err := New(cat, cfg, Options{Shell: "zsh", GOOS: goos, BinDir: "/tmp/bin"})
 	if err != nil {
 		t.Fatalf("building generator: %v", err)
@@ -78,7 +84,9 @@ func TestAllFunctionsRender(t *testing.T) {
 	rendered := render(t, loadFixture(t), "linux")
 	for _, fn := range []string{
 		"activate", "denv", "gcfg", "kp", "lenv", "mpush",
-		"msh", "nig", "p", "pv", "pw", "s", "venv", "wt",
+		"msh", "nig", "p", "pv", "pw", "s", "venv",
+		// Named from the fixture's clone_sources, not from the catalog.
+		"clone-eg",
 	} {
 		if !strings.Contains(rendered, fn+"() {") {
 			t.Errorf("function %q not present in output", fn)
@@ -116,8 +124,8 @@ func TestNoAssociativeArrays(t *testing.T) {
 // the old associative-array implementation kept getting wrong.
 func TestHyphenatedWorkspaceResolves(t *testing.T) {
 	rendered := render(t, loadFixture(t), "linux")
-	if !strings.Contains(rendered, "a11-wb) target=") {
-		t.Error("hyphenated workspace a11-wb has no case branch in the generated pw")
+	if !strings.Contains(rendered, "api-web) target=") {
+		t.Error("hyphenated workspace api-web has no case branch in the generated pw")
 	}
 }
 

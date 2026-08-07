@@ -46,7 +46,7 @@ A clean split, and the reason emails can sit in plaintext config:
 - **`~/.config/loadout/`** holds the user's data: `config.yaml`, generated `init.zsh`, state.
 - **OS keychain** holds credentials only.
 
-Nothing personal is committed to this repo after the restructure.
+Nothing personal is committed to this repo. The test fixture and every example use illustrative values; the only exceptions are in this document and the triage record, where naming the actual aliases that were migrated is the point.
 
 ## Repo layout
 
@@ -67,7 +67,8 @@ internal/
   server/              localhost web UI + its security            ✓
     web/               embedded page, no build step                ✓
   sync/                git-backed config repo + secret scan         ✓
-testdata/parity/       fixture config + verify.sh           ✓
+testdata/fixture/      config exercising every schema section  ✓
+testdata/golden/       pinned output, 2 shells x 2 platforms   ✓
 docs/
 ```
 
@@ -105,7 +106,7 @@ hosts:
     hostname: 10.0.0.5
     user: root
     port: 22
-    auth: { key: ~/.ssh/sucasa } # or { password: cred:host_password }
+    auth: { key: ~/.ssh/deploy } # or { password: cred:host_password }
     upload_path: ~
 
 workspaces:
@@ -115,7 +116,7 @@ workspaces:
 
 clone_sources:
   - alias: wt
-    org: wesnetech
+    org: example-org
 
 npm_globals: [pm2, serve, prettier, "@nestjs/cli"]
 
