@@ -1,15 +1,11 @@
 #!/usr/bin/env bash
 
-#: Title:           fmt
-#: Date:            Fri Aug  7 2026
-#: Author:          WessCoby
-#: Version:         1.0.0
-#: Description:     Format this repo. shfmt handles the shell files (aliases,
-#:                  zsh functions, bin scripts), Prettier handles markdown.
-#:                  Usage: fmt [--staged | --check]
-#:                    (no flag)  format every tracked file
-#:                    --staged   format only staged files, then restage them
-#:                    --check    report unformatted files, write nothing
+#: fmt -- Format this repo. shfmt handles the shell files (aliases,
+#: zsh functions, bin scripts), Prettier handles markdown.
+#: Usage: fmt [--staged | --check]
+#:   (no flag)  format every tracked file
+#:   --staged   format only staged files, then restage them
+#:   --check    report unformatted files, write nothing
 
 # Begin Scripting
 

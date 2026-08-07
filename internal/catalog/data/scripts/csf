@@ -1,20 +1,16 @@
 #!/bin/bash
 
-# Title       : csf
-# Date        : 17.05.2019
-# Author      : WessCoby
-# Version     : 1.0.0
-# Description : Short for 'Create Script File' [A simple bash script creator]
-#               Creates a new bash script file in the current working directory.
-#               This kind of solves the CR [Carriage Return (\r)]
-#               and LF [Linefeed (\n)] issue in Windows, since the file
-#               will be created in a Unix environment, and not Windows.
-#               Therefore, after creating the script file, just open it
-#               in your editor and start writing your script
+# csf -- Short for 'Create Script File' [A simple bash script creator]
+# Creates a new bash script file in the current working directory.
+# This kind of solves the CR [Carriage Return (\r)]
+# and LF [Linefeed (\n)] issue in Windows, since the file
+# will be created in a Unix environment, and not Windows.
+# Therefore, after creating the script file, just open it
+# in your editor and start writing your script
 # Options     : Specify file name [you can choose to add a bash extension]
 
 #---------------------------------------------------------------------
-#                                FUNCTIONS
+#                  FUNCTIONS
 #---------------------------------------------------------------------
 
 ### Prompt for file name
@@ -45,7 +41,7 @@ createScriptFile() {
 }
 
 #---------------------------------------------------------------------
-#                                 START
+#                   START
 #---------------------------------------------------------------------
 
 ### If no argument is passed when script is invoked

@@ -1,9 +1,7 @@
 #!/bin/sh
 
-#: Title:           sshp
-#: Version:         2.0.0
-#: Description:     Set correct permissions on everything in ~/.ssh.
-#:                  ssh refuses to use a private key that others can read.
+#: sshp -- Set correct permissions on everything in ~/.ssh.
+#: ssh refuses to use a private key that others can read.
 
 # POSIX sh and a shell loop rather than find -regex: BSD find on macOS uses a
 # different regex flavour, and the previous version matched only *rsa and

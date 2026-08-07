@@ -1,11 +1,7 @@
 #!/usr/bin/env bash
 
-#: Title:           pre-commit
-#: Date:            Fri Aug  7 2026
-#: Author:          WessCoby
-#: Version:         1.0.0
-#: Description:     Format staged files before they are committed.
-#:                  Enabled per clone with: git config core.hooksPath hooks
+#: pre-commit -- Format staged files before they are committed.
+#: Enabled per clone with: git config core.hooksPath hooks
 
 # Begin Scripting
 
