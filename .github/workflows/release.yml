@@ -16,6 +16,10 @@ jobs:
       TAP_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Full history and tags: the notes diff the golden files against the
+          # previous release to tell users whether to re-run apply.
+          fetch-depth: 0
 
       - uses: actions/setup-go@v5
         with:
@@ -34,13 +38,19 @@ jobs:
       - name: Render the Homebrew formula
         run: make tap VERSION=${{ github.ref_name }}
 
+      - name: Build the release notes
+        run: |
+          packaging/release-notes.sh "${{ github.ref_name }}" > dist/NOTES.md
+          echo "--- release body ---"
+          cat dist/NOTES.md
+
       - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "${{ github.ref_name }}" \
             --title "${{ github.ref_name }}" \
-            --generate-notes \
+            --notes-file dist/NOTES.md \
             dist/*.tar.gz dist/checksums.txt
 
       # A tap that is not updated keeps installing the previous version

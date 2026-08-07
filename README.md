@@ -313,13 +313,16 @@ make check     # build, vet, test, format
 make golden    # re-record the golden files after an intended change
 make release   # cross-compile every platform into dist/ with checksums
 make tap       # render the Homebrew formula from those checksums
+make notes     # preview the release notes for VERSION
 ```
 
 The generated shell is pinned by golden files in `testdata/golden`, covering both shells and both platforms. A change to the catalog or a template shows up as a diff there, which is what you review.
 
 ### Releasing
 
-Pushing a `v*` tag runs the release workflow: it tests, cross-compiles all four platforms, publishes a GitHub release with the tarballs and `checksums.txt`, renders the Homebrew formula from those checksums, and commits it to the tap.
+Pushing a `v*` tag runs the release workflow: it tests, cross-compiles all four platforms, builds the release notes, publishes a GitHub release with the tarballs and `checksums.txt`, renders the Homebrew formula from those checksums, and commits it to the tap.
+
+Release notes come from the version's section in [CHANGELOG.md](CHANGELOG.md), with install and upgrade instructions and the checksums appended. One part is computed rather than written: the notes diff `testdata/golden` against the previous tag, and when the generated shell changed they say so and tell readers to run `loadout apply`. Upgrading the binary does not rewrite the file a shell sources, so without that line an upgrade looks like it did nothing.
 
 The tap push needs a `TAP_GITHUB_TOKEN` secret with write access to `loadoutsh/homebrew-loadout`. Without one the release still publishes and the workflow warns instead of failing, since a missing tap update should not block the release everyone else installs from. Publish `dist/loadout.rb` by hand in that case: a tap left behind keeps serving the old version, and `brew upgrade` will report there is nothing to do.
 

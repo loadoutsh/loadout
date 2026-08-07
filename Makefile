@@ -74,6 +74,10 @@ tap: ## Render the Homebrew formula from dist/checksums.txt into dist/loadout.rb
 	@echo "  wrote $(DIST)/loadout.rb for $(VERSION)"
 	@echo "  publish to loadoutsh/homebrew-loadout as Formula/loadout.rb"
 
+.PHONY: notes
+notes: ## Preview the release notes for VERSION
+	@packaging/release-notes.sh $(VERSION)
+
 .PHONY: clean
 clean: ## Remove build artefacts
 	rm -rf $(DIST) $(BINARY)
