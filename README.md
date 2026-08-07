@@ -173,6 +173,22 @@ A scanner runs before the commit, not before the push, so a credential pasted in
 
 Use a private repository. The config holds no secrets, but it names your hosts, paths and identities.
 
+## Updating
+
+```sh
+loadout update --check    # is there a newer release?
+loadout update            # install it
+```
+
+It only replaces the binary when loadout owns the file. If Homebrew or the Go
+toolchain installed it, that tool owns it, and overwriting the file behind its
+back leaves it reporting a version it never installed — so `update` prints the
+right command for your install method instead.
+
+The download is HTTPS on every hop, the checksum is verified, and a release
+publishing no checksum is refused outright. The replacement is a rename, so an
+interrupted update cannot leave a broken binary on your PATH.
+
 ## Uninstalling
 
 ```sh

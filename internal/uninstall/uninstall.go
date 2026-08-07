@@ -19,6 +19,7 @@ import (
 
 	"github.com/loadoutsh/loadout/internal/config"
 	"github.com/loadoutsh/loadout/internal/credentials"
+	"github.com/loadoutsh/loadout/internal/selfupdate"
 )
 
 // Kind distinguishes the sorts of thing that can be removed, because they
@@ -246,21 +247,22 @@ func shellIntegration(cfgDir string) (rc, line string) {
 	return "", ""
 }
 
-// self locates loadout's own binary and works out how it was installed.
+// self locates loadout's own binary and says how to remove it.
+//
+// Install-method detection lives in selfupdate, so update and uninstall
+// cannot disagree about how loadout got here.
 func self() (path, hint string) {
-	exe, err := os.Executable()
-	if err != nil {
+	method, exe := selfupdate.Detect()
+	if exe == "" {
 		return "", ""
 	}
-	if resolved, err := filepath.EvalSymlinks(exe); err == nil {
-		exe = resolved
-	}
-
-	switch {
-	case strings.Contains(exe, "/Cellar/"), strings.Contains(exe, "/linuxbrew/"):
+	switch method {
+	case selfupdate.MethodHomebrew:
 		return exe, "brew uninstall loadout"
-	case strings.HasSuffix(filepath.Dir(exe), filepath.Join("go", "bin")):
+	case selfupdate.MethodGoInstall:
 		return exe, "rm " + exe + "   (installed with go install)"
+	case selfupdate.MethodSource:
+		return exe, "rm " + exe + "   (built from a checkout)"
 	default:
 		return exe, "rm " + exe
 	}
