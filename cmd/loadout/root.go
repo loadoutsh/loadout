@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/spf13/cobra"
 )
 
@@ -15,6 +17,12 @@ Edit ~/.config/loadout/config.yaml, run 'loadout apply', reload your shell.`,
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
+
+	// Cobra's Print helpers fall back to stderr when no out writer is set.
+	// That silently broke `eval "$(loadout env)"`, which captures stdout only,
+	// so the exports went nowhere. Set both explicitly.
+	root.SetOut(os.Stdout)
+	root.SetErr(os.Stderr)
 
 	root.AddCommand(
 		newApplyCmd(),

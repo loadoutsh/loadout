@@ -100,7 +100,7 @@ Names are upper-cased, so a credential called npm_token exports NPM_TOKEN.`,
 					}
 					continue
 				}
-				cmd.Printf("export %s=%s\n", envName(name), shellQuote(value))
+				fmt.Fprintf(cmd.OutOrStdout(), "export %s=%s\n", envName(name), shellQuote(value))
 			}
 
 			if len(missing) > 0 && !quiet {

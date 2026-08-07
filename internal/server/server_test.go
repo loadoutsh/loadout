@@ -204,6 +204,50 @@ func TestTokenInQueryServesThePage(t *testing.T) {
 	}
 }
 
+// A browser fetches app.css and app.js from <link> and <script> tags, which
+// cannot set a header and whose relative URLs carry no query string. Requiring
+// a token on static assets left the page unstyled and inert. Fetch them the
+// way a browser does: no token, no query string, just a Referer.
+func TestStaticAssetsLoadWithoutAToken(t *testing.T) {
+	_, base := start(t)
+	for _, asset := range []string{"/app.css", "/app.js", "/"} {
+		res := do(t, "GET", base+asset, func(r *http.Request) {
+			r.Header.Set("Referer", base+"/")
+		})
+		if res.StatusCode != http.StatusOK {
+			t.Errorf("GET %s without a token: status = %d, want 200 "+
+				"(a <script> tag cannot present one)", asset, res.StatusCode)
+		}
+		body, _ := io.ReadAll(res.Body)
+		if len(body) == 0 {
+			t.Errorf("GET %s returned an empty body", asset)
+		}
+	}
+}
+
+// Dropping the token on static assets must not weaken the API.
+func TestAPIStillRequiresATokenAfterStaticIsOpen(t *testing.T) {
+	_, base := start(t)
+	for _, path := range []string{"/api/state", "/api/diff"} {
+		res := do(t, "GET", base+path, nil)
+		if res.StatusCode != http.StatusUnauthorized {
+			t.Errorf("GET %s without a token: status = %d, want 401", path, res.StatusCode)
+		}
+	}
+}
+
+// The loopback checks must still apply to static assets, so a rebound
+// hostname cannot even load the page.
+func TestStaticAssetsStillCheckHost(t *testing.T) {
+	srv, base := start(t)
+	res := do(t, "GET", base+"/app.js", func(r *http.Request) {
+		r.Host = "attacker.example.com:" + srv.port
+	})
+	if res.StatusCode != http.StatusForbidden {
+		t.Errorf("status = %d, want 403", res.StatusCode)
+	}
+}
+
 func TestToggleAndDiffRoundTrip(t *testing.T) {
 	srv, base := start(t)
 

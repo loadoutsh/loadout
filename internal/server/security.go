@@ -71,8 +71,9 @@ func allowedOrigin(origin, port string) bool {
 	return allowedHost(u.Host, port)
 }
 
-// guard wraps a handler with the origin, host and token checks.
-func (s *Server) guard(next http.Handler) http.Handler {
+// baseGuard applies the checks that every request must pass: it must be
+// addressed to loopback, and it must not come from another site's page.
+func (s *Server) baseGuard(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !allowedHost(r.Host, s.port) {
 			http.Error(w, "bad host", http.StatusForbidden)
@@ -80,18 +81,6 @@ func (s *Server) guard(next http.Handler) http.Handler {
 		}
 		if !allowedOrigin(r.Header.Get("Origin"), s.port) {
 			http.Error(w, "bad origin", http.StatusForbidden)
-			return
-		}
-
-		// The page itself is fetched with the token in the query string,
-		// because a browser navigation cannot set a header. Everything the
-		// page then calls uses the header.
-		got := r.Header.Get("X-Loadout-Token")
-		if got == "" {
-			got = r.URL.Query().Get("token")
-		}
-		if !tokenOK(s.token, got) {
-			http.Error(w, "bad or missing token", http.StatusUnauthorized)
 			return
 		}
 
@@ -103,6 +92,31 @@ func (s *Server) guard(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+// guard adds the token check, and is applied to the API only.
+//
+// Static assets deliberately do not require it. A <link> or <script> tag
+// cannot send a header, and their relative URLs carry no query string, so
+// requiring a token there simply breaks the page. Serving them unauthenticated
+// discloses nothing: they are inert files compiled into the binary, identical
+// for every user. Everything that reads configuration or writes to disk is
+// behind this.
+func (s *Server) guard(next http.Handler) http.Handler {
+	return s.baseGuard(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// The page load carries the token in the query string, because a
+		// browser navigation cannot set a header. The page's own calls use
+		// the header from then on.
+		got := r.Header.Get("X-Loadout-Token")
+		if got == "" {
+			got = r.URL.Query().Get("token")
+		}
+		if !tokenOK(s.token, got) {
+			http.Error(w, "bad or missing token", http.StatusUnauthorized)
+			return
+		}
+		next.ServeHTTP(w, r)
+	}))
 }
 
 // URL is the address to open, token included.

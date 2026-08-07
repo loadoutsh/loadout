@@ -70,17 +70,22 @@ func (s *Server) Serve(ctx context.Context, port int, onReady func(url string)) 
 		return err
 	}
 
+	api := http.NewServeMux()
+	api.HandleFunc("/api/state", s.handleState)
+	api.HandleFunc("/api/toggle", s.handleToggle)
+	api.HandleFunc("/api/diff", s.handleDiff)
+	api.HandleFunc("/api/apply", s.handleApply)
+	api.HandleFunc("/api/cred/use", s.handleCredUse)
+	api.HandleFunc("/api/cred/set", s.handleCredSet)
+
 	mux := http.NewServeMux()
-	mux.Handle("/", http.FileServer(http.FS(sub)))
-	mux.HandleFunc("/api/state", s.handleState)
-	mux.HandleFunc("/api/toggle", s.handleToggle)
-	mux.HandleFunc("/api/diff", s.handleDiff)
-	mux.HandleFunc("/api/apply", s.handleApply)
-	mux.HandleFunc("/api/cred/use", s.handleCredUse)
-	mux.HandleFunc("/api/cred/set", s.handleCredSet)
+	// The API needs the token; the static page does not, since a <script> tag
+	// cannot present one. Both still require a loopback Host and our Origin.
+	mux.Handle("/api/", s.guard(api))
+	mux.Handle("/", s.baseGuard(http.FileServer(http.FS(sub))))
 
 	srv := &http.Server{
-		Handler:           s.guard(mux),
+		Handler:           mux,
 		ReadHeaderTimeout: 10 * time.Second,
 	}
 

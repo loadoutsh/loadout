@@ -1,10 +1,27 @@
 "use strict";
 
 // The token arrives in the query string, because a browser navigation cannot
-// set a header. It is moved into memory and stripped from the URL immediately
-// so it does not sit in the address bar or leak through history.
-const TOKEN = new URLSearchParams(location.search).get("token") || "";
-history.replaceState(null, "", location.pathname);
+// set a header. Keep it for the tab's lifetime, then strip it from the URL so
+// it does not sit in the address bar or leak through history. sessionStorage
+// rather than memory alone, so a reload does not lose it and leave the page
+// unable to talk to its own API.
+const TOKEN = (() => {
+  const fromURL = new URLSearchParams(location.search).get("token");
+  if (fromURL) {
+    try {
+      sessionStorage.setItem("loadout-token", fromURL);
+    } catch {
+      /* private mode; the in-memory value still serves this page view */
+    }
+    history.replaceState(null, "", location.pathname);
+    return fromURL;
+  }
+  try {
+    return sessionStorage.getItem("loadout-token") || "";
+  } catch {
+    return "";
+  }
+})();
 
 let STATE = null;
 
