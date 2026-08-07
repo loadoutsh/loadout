@@ -129,6 +129,20 @@ loadout cred use npm_token work    # switch the active entry
 eval "$(loadout env)"              # bring the active values into this shell
 ```
 
+The exported variable name is derived from the credential key — `npm_token`
+becomes `NPM_TOKEN`. When the tool reading it expects something else, say so:
+
+```yaml
+credentials:
+  gh_token:
+    env: GHP_TOKEN # what gets exported, when the key does not derive it
+    active: personal
+    entries: [personal, work]
+```
+
+Two credentials resolving to the same variable is rejected at load time, since
+otherwise one would silently overwrite the other.
+
 That `eval` is a deliberate cost. Baking secrets into the generated file would put them in plain text on disk, so something has to run to fetch them. loadout does not add it to your shell startup; do that yourself only if you want the values in every shell.
 
 An identity can nominate credential entries, so `s work` switches your git author, your SSH key and your tokens in one command.

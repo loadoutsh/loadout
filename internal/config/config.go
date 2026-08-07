@@ -74,6 +74,26 @@ type Identity struct {
 type Credential struct {
 	Active  string   `yaml:"active"`
 	Entries []string `yaml:"entries"`
+
+	// Env overrides the environment variable this credential exports as.
+	// Empty derives it from the key: npm_token becomes NPM_TOKEN. Set it when
+	// the consuming tool expects a name the key does not produce, which is
+	// common enough that deriving it was a mistake to make unavoidable.
+	Env string `yaml:"env,omitempty"`
+}
+
+// EnvName is the variable this credential exports as.
+func (c Credential) EnvName(key string) string {
+	if c.Env != "" {
+		return c.Env
+	}
+	return DeriveEnvName(key)
+}
+
+// DeriveEnvName is the default mapping from a credential key to a variable
+// name: upper-cased, with separators normalised to underscores.
+func DeriveEnvName(key string) string {
+	return strings.ToUpper(strings.NewReplacer("-", "_", ".", "_", "/", "_").Replace(key))
 }
 
 // Host is a remote machine reachable over SSH, used by msh and mpush.
@@ -425,10 +445,19 @@ func (c *Config) Validate() error {
 		return fmt.Errorf("%d identities marked default, expected at most 1", defaults)
 	}
 
+	envNames := map[string]string{}
 	for name, cred := range c.Credentials {
 		if cred.Active != "" && !contains(cred.Entries, cred.Active) {
 			return fmt.Errorf("credential %q is active on %q, which is not in its entries", name, cred.Active)
 		}
+		// Two credentials exporting the same variable means one silently
+		// overwrites the other, with the winner decided by map iteration.
+		env := cred.EnvName(name)
+		if other, clash := envNames[env]; clash {
+			return fmt.Errorf("credentials %q and %q both export %s; set a distinct \"env\" on one of them",
+				other, name, env)
+		}
+		envNames[env] = name
 	}
 
 	seenHost := map[string]bool{}

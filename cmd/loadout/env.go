@@ -100,7 +100,7 @@ Names are upper-cased, so a credential called npm_token exports NPM_TOKEN.`,
 					}
 					continue
 				}
-				fmt.Fprintf(cmd.OutOrStdout(), "export %s=%s\n", envName(name), shellQuote(value))
+				fmt.Fprintf(cmd.OutOrStdout(), "export %s=%s\n", c.EnvName(name), shellQuote(value))
 			}
 
 			if len(missing) > 0 && !quiet {
@@ -114,11 +114,6 @@ Names are upper-cased, so a credential called npm_token exports NPM_TOKEN.`,
 	cmd.Flags().StringVar(&identity, "identity", "", "render the environment for this identity's entries")
 	cmd.Flags().BoolVar(&quiet, "quiet", false, "suppress diagnostics, for use in shell startup")
 	return cmd
-}
-
-// envName turns a credential name into an environment variable name.
-func envName(name string) string {
-	return strings.ToUpper(strings.NewReplacer("-", "_", ".", "_", "/", "_").Replace(name))
 }
 
 // shellQuote single-quotes a value for safe eval. A secret can contain
