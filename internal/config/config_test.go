@@ -8,11 +8,11 @@ import (
 // The derived name is the default, and it is what most credentials want.
 func TestDeriveEnvName(t *testing.T) {
 	cases := map[string]string{
-		"npm_token":  "NPM_TOKEN",
-		"gh_token":   "GH_TOKEN",
-		"my-token":   "MY_TOKEN",
-		"a.b":        "A_B",
-		"a/b":        "A_B",
+		"npm_token":     "NPM_TOKEN",
+		"gh_token":      "GH_TOKEN",
+		"my-token":      "MY_TOKEN",
+		"a.b":           "A_B",
+		"a/b":           "A_B",
 		"host_password": "HOST_PASSWORD",
 	}
 	for in, want := range cases {
