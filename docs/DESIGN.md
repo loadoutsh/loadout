@@ -2,7 +2,7 @@
 
 Turning this personal dotfiles repo into an installable CLI application for Linux and macOS, with a local web UI for managing it.
 
-Status: **Phases 0 to 3 complete.** Open questions are collected at the end.
+Status: **Phases 0 to 4 complete.** Open questions are collected at the end.
 
 ## What we are building
 
@@ -64,8 +64,8 @@ internal/
   binaries/            fetch, verify, extract, install, state       ✓
   credentials/         keychain: security, secret-tool, pass       ✓
   requires/            capability checks for doctor and describe    ✓
-  server/              localhost web UI
-web/                   UI source, built and embedded
+  server/              localhost web UI + its security            ✓
+    web/               embedded page, no build step                ✓
 testdata/parity/       fixture config + verify.sh           ✓
 docs/
 ```
@@ -272,7 +272,17 @@ This is where the review findings become product features. On this machine right
 | Doctor        | missing tools, dead paths, unmet requirements, platform mismatch |
 | Diff & apply  | preview the generated shell before writing it                    |
 
-Diff-before-apply matters more than it sounds: the tool writes a file sourced into every shell you open. Showing exactly what changes is what makes that trustworthy, and it is nearly free since we are generating text anyway.
+Diff-before-apply matters more than it sounds: the tool writes a file sourced into every shell you open. Showing exactly what changes is what makes that trustworthy, and it is nearly free since we are generating text anyway. A test asserts the applied file is byte-identical to what the diff previewed, because a preview that can differ from the result is worse than no preview.
+
+### Why the UI needs real access control
+
+Binding to 127.0.0.1 keeps other machines out. It does not keep other _pages_ out: any site open in the user's browser can issue requests to localhost. Since this API rewrites the file their shell sources, that would be a remote code execution path. Three checks, all enforced before any handler runs:
+
+- **A per-run token**, compared in constant time. It reaches the page in the query string, because a navigation cannot set a header, and the page strips it from the URL immediately so it does not linger in the address bar or history.
+- **Origin refused** unless it is our own loopback address, so another site cannot drive the API even if it somehow learned the token.
+- **Host required to be loopback**, which is the defence against DNS rebinding: an attacker pointing their own hostname at 127.0.0.1 gets a Host header that does not match.
+
+Credential values are never sent to the page. The UI is told only whether a value exists.
 
 ## Distribution
 
