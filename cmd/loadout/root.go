@@ -23,6 +23,9 @@ Edit ~/.config/loadout/config.yaml, run 'loadout apply', reload your shell.`,
 		newDescribeCmd(),
 		newDoctorCmd(),
 		newBinCmd(),
+		newCredCmd(),
+		newEnvCmd(),
+		newIdentityCmd(),
 		newVersionCmd(),
 	)
 	return root

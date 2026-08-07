@@ -13,6 +13,7 @@ import (
 
 	"github.com/wesscoby/loadout/internal/catalog"
 	"github.com/wesscoby/loadout/internal/config"
+	"github.com/wesscoby/loadout/internal/credentials"
 	"github.com/wesscoby/loadout/internal/generate"
 	"github.com/wesscoby/loadout/internal/requires"
 )
@@ -142,6 +143,7 @@ Warnings exit 0. Failures exit 1.`,
 			checkFunctions(rep, cat, cfg, chk)
 			checkAliases(rep, cat, cfg, chk)
 			checkBinDir(rep)
+			checkCredentials(rep, cfg)
 
 			rep.write(out, verbose)
 
@@ -390,4 +392,49 @@ func checkBinDir(rep *report) {
 	}
 	rep.add("Managed binaries", finding{warn, "bin directory exists but is not on PATH",
 		dir + "\nrun 'loadout apply' and reload your shell"})
+}
+
+// checkCredentials reports keychain availability and which declared entries
+// have no value yet. Values themselves are never read into the report.
+func checkCredentials(rep *report, cfg *config.Config) {
+	if len(cfg.Credentials) == 0 {
+		return
+	}
+
+	ring, err := credentials.Open()
+	if err != nil {
+		rep.add("Credentials", finding{warn, "no keychain backend available", err.Error()})
+		return
+	}
+	rep.add("Credentials", finding{ok, "keychain available", ring.Name()})
+
+	names := make([]string, 0, len(cfg.Credentials))
+	for n := range cfg.Credentials {
+		names = append(names, n)
+	}
+	sort.Strings(names)
+
+	var missing []string
+	for _, name := range names {
+		c := cfg.Credentials[name]
+		if c.Active == "" {
+			rep.add("Credentials", finding{warn,
+				fmt.Sprintf("%s has no active entry", name),
+				fmt.Sprintf("run 'loadout cred use %s <entry>'", name)})
+			continue
+		}
+		// Only the active entry matters for a working shell; an unset
+		// alternative is a normal state, not a problem.
+		if _, err := ring.Get(credentials.Key(name, c.Active)); err != nil {
+			missing = append(missing, fmt.Sprintf("%s/%s", name, c.Active))
+		}
+	}
+
+	if len(missing) > 0 {
+		rep.add("Credentials", finding{warn,
+			fmt.Sprintf("%d active entr(y/ies) have no stored value", len(missing)),
+			strings.Join(missing, "\n") + "\nset with 'loadout cred set <credential> <entry>'"})
+	} else {
+		rep.add("Credentials", finding{ok, "every active entry has a value", ""})
+	}
 }

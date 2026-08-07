@@ -2,7 +2,7 @@
 
 Turning this personal dotfiles repo into an installable CLI application for Linux and macOS, with a local web UI for managing it.
 
-Status: **Phases 0 to 2 complete.** Open questions are collected at the end.
+Status: **Phases 0 to 3 complete.** Open questions are collected at the end.
 
 ## What we are building
 
@@ -62,7 +62,7 @@ internal/
   generate/            rendering                            ✓
     backend/           Backend interface; zsh               ✓
   binaries/            fetch, verify, extract, install, state       ✓
-  credentials/         keychain abstraction
+  credentials/         keychain: security, secret-tool, pass       ✓
   requires/            capability checks for doctor and describe    ✓
   server/              localhost web UI
 web/                   UI source, built and embedded
@@ -158,6 +158,20 @@ aliases:
 Aliases sort into four buckets: shipped defaults, generated-from-config, opt-in packs, and dropped. See [ALIAS-TRIAGE.md](ALIAS-TRIAGE.md) for the pass over all 188.
 
 Credentials store only names and which one is active. Values are keychain-backed, addressed as `loadout/<credential>/<entry>`.
+
+### How secrets reach the shell
+
+They are deliberately **not** written into the generated file, because that file is plain text on disk. Something therefore has to run to fetch them:
+
+```sh
+eval "$(loadout env)"
+```
+
+That is a real cost — one subprocess, and possibly a keychain unlock prompt — which is exactly why it is not added to shell startup automatically. Put it in your shell config only if you want tokens present in every shell. The trade is explicit rather than hidden.
+
+The output is `eval`-ed, so every value is single-quoted with embedded quotes escaped; a token containing `$(...)` or backticks cannot execute anything.
+
+Backends are tried in order and the first available wins: `security` on macOS, `secret-tool` (libsecret) on Linux, then `pass`. When none is present the error names what to install rather than just failing, which matters on a server where none of them exist.
 
 ## Binaries and scripts
 

@@ -43,6 +43,17 @@ npm_globals:
   - "@infisical/cli"
   - prettier
 
+# Named secrets with one active entry each. Values live in the OS keychain,
+# never here. This replaces the old habit of commenting out NPM_TOKEN lines
+# in .env to switch between them.
+credentials:
+  npm_token:
+    active: personal
+    entries: [personal, work]
+  gh_token:
+    active: personal
+    entries: [personal, work]
+
 identities:
   - id: default
     git_user: WessCoby
@@ -65,6 +76,11 @@ identities:
     git_user: Wess
     email: wc@example.com
     ssh_key: ~/.ssh/wc_ed
+    # Switching to this identity also swaps these credential entries, so one
+    # command changes git author, SSH key and tokens together.
+    activates:
+      npm_token: work
+      gh_token: work
 
 hosts:
   # Shortcut hosts: these also emit a bare `ssh <alias>` alias, matching the

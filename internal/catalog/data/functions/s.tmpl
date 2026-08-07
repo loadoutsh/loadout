@@ -9,6 +9,11 @@ s() {
 			git config --global user.email "{{ .Email }}"
 			ssh-add -D > /dev/null 2>&1
 			ssh-add "{{ shpath .SSHKey }}"
+{{- if .Activates }}
+			# Swap the credential entries this identity nominates, and bring the
+			# new values into this shell in the same step.
+			eval "$(loadout identity activate {{ .ID }} --export)"
+{{- end }}
 			;;
 {{- end }}
 		*)
