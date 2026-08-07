@@ -56,20 +56,21 @@ Two of the shipped functions, `p` and `activate`, change your shell's directory 
 
 ## Commands
 
-| Command            | What it does                                                     |
-| ------------------ | ---------------------------------------------------------------- |
-| `loadout init`     | Create your configuration                                        |
-| `loadout apply`    | Render the shell file                                            |
-| `loadout doctor`   | Report anything that would not work here                         |
-| `loadout describe` | What a command does, how to call it, what it needs               |
-| `loadout catalog`  | What the shipped set contains                                    |
-| `loadout ui`       | Local web interface                                              |
-| `loadout bin`      | Manage third-party executables on your PATH                      |
-| `loadout cred`     | Secrets, stored in your OS keychain                              |
-| `loadout env`      | Export the active credentials into your shell                    |
-| `loadout identity` | Switch git author, SSH key and credentials together              |
-| `loadout sync`     | Keep your configuration in git across machines                   |
-| `loadout scan`     | Check your config for anything that looks like a live credential |
+| Command             | What it does                                                     |
+| ------------------- | ---------------------------------------------------------------- |
+| `loadout init`      | Create your configuration                                        |
+| `loadout apply`     | Render the shell file                                            |
+| `loadout doctor`    | Report anything that would not work here                         |
+| `loadout describe`  | What a command does, how to call it, what it needs               |
+| `loadout catalog`   | What the shipped set contains                                    |
+| `loadout ui`        | Local web interface                                              |
+| `loadout bin`       | Manage third-party executables on your PATH                      |
+| `loadout cred`      | Secrets, stored in your OS keychain                              |
+| `loadout env`       | Export the active credentials into your shell                    |
+| `loadout identity`  | Switch git author, SSH key and credentials together              |
+| `loadout sync`      | Keep your configuration in git across machines                   |
+| `loadout scan`      | Check your config for anything that looks like a live credential |
+| `loadout uninstall` | Remove everything loadout has put on this machine                |
 
 ## Configuration
 
@@ -171,6 +172,26 @@ Only `config.yaml` travels. The generated file is regenerated per machine, and `
 A scanner runs before the commit, not before the push, so a credential pasted into your config never enters the history at all.
 
 Use a private repository. The config holds no secrets, but it names your hosts, paths and identities.
+
+## Uninstalling
+
+```sh
+loadout uninstall          # lists everything, removes nothing
+loadout uninstall --yes    # do it
+```
+
+Deleting the directories by hand leaves every keychain entry behind, and
+leaves them unfindable: your config is the only record of what they are
+called. `uninstall` lists them by name first, including any the config has
+forgotten about, and asks for a separate confirmation before deleting a
+secret.
+
+`--keep-config` retains your configuration for a reinstall. `--keep-credentials`
+leaves the keychain alone entirely.
+
+Two things it will not do: edit your shell config, since it never wrote that
+line in the first place, and delete its own binary. It prints the exact line
+and the right command for both.
 
 ## Development
 

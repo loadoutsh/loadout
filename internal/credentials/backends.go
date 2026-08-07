@@ -169,3 +169,49 @@ func run(cmd *exec.Cmd) error {
 	}
 	return nil
 }
+
+// List enumerates loadout's entries in the libsecret collection.
+func (secretToolBackend) List() ([]string, error) {
+	out, err := exec.Command("secret-tool", "search", "--all", "service", service).CombinedOutput()
+	if err != nil {
+		// A search matching nothing exits non-zero, which is not a failure.
+		if len(bytes.TrimSpace(out)) == 0 {
+			return nil, nil
+		}
+		return nil, err
+	}
+	var keys []string
+	for _, line := range strings.Split(string(out), "\n") {
+		// Lines look like: attribute.key = npm_token/work
+		if rest, found := strings.CutPrefix(strings.TrimSpace(line), "attribute.key = "); found {
+			keys = append(keys, rest)
+		}
+	}
+	return keys, nil
+}
+
+// List enumerates loadout's entries in the password store.
+func (p passBackend) List() ([]string, error) {
+	out, err := exec.Command("pass", "ls", service).Output()
+	if err != nil {
+		return nil, nil // no such subtree is not a failure
+	}
+	var keys []string
+	var group string
+	for _, line := range strings.Split(string(out), "\n") {
+		t := strings.TrimLeft(line, "|`-└├─ ")
+		t = strings.TrimSpace(t)
+		if t == "" || t == service {
+			continue
+		}
+		// pass ls prints a tree: credentials are groups, entries are leaves.
+		if strings.HasSuffix(t, "/") {
+			group = strings.TrimSuffix(t, "/")
+			continue
+		}
+		if group != "" {
+			keys = append(keys, group+"/"+t)
+		}
+	}
+	return keys, nil
+}

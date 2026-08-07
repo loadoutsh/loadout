@@ -8,6 +8,7 @@ package credentials
 import (
 	"errors"
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -82,4 +83,35 @@ func Available() []string {
 		}
 	}
 	return out
+}
+
+// Lister is implemented by backends that can enumerate what they hold under
+// loadout's namespace.
+//
+// Not every backend can. libsecret and pass both support a prefix search;
+// the macOS security tool has no equivalent that works without prompting for
+// approval on every item. Uninstall therefore treats the config as the
+// authoritative list and uses this only to catch entries the config has
+// forgotten about.
+type Lister interface {
+	// List returns the keys stored under the loadout service, in "cred/entry"
+	// form.
+	List() ([]string, error)
+}
+
+// ListKeys enumerates a keyring's contents when the backend supports it.
+// The second return reports whether enumeration was possible at all, which
+// the caller needs in order to distinguish "nothing stored" from "cannot
+// tell".
+func ListKeys(k Keyring) ([]string, bool) {
+	l, ok := k.(Lister)
+	if !ok {
+		return nil, false
+	}
+	keys, err := l.List()
+	if err != nil {
+		return nil, false
+	}
+	sort.Strings(keys)
+	return keys, true
 }

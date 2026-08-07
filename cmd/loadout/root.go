@@ -37,6 +37,7 @@ Edit ~/.config/loadout/config.yaml, run 'loadout apply', reload your shell.`,
 		newUICmd(),
 		newSyncCmd(),
 		newScanCmd(),
+		newUninstallCmd(),
 		newVersionCmd(),
 	)
 	return root
