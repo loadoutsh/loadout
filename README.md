@@ -326,6 +326,18 @@ Release notes come from the version's section in [CHANGELOG.md](CHANGELOG.md), w
 
 The tap push needs a `TAP_GITHUB_TOKEN` secret with write access to `loadoutsh/homebrew-loadout`. Without one the release still publishes and the workflow warns instead of failing, since a missing tap update should not block the release everyone else installs from. Publish `dist/loadout.rb` by hand in that case: a tap left behind keeps serving the old version, and `brew upgrade` will report there is nothing to do.
 
+## Contributing
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) first. It covers where a change belongs
+— core, pack, user config, or nowhere — and the handful of rules that exist
+because something went wrong without them.
+
+- [CHANGELOG.md](CHANGELOG.md) — what changed, per release
+- [docs/DESIGN.md](docs/DESIGN.md) — architecture and the decisions behind it
+- [docs/ALIAS-TRIAGE.md](docs/ALIAS-TRIAGE.md) — how the shipped set was chosen
+- [SECURITY.md](SECURITY.md) — threat model, defences, and how to report
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+
 ## Licence
 
 MIT. See [LICENSE](LICENSE).

@@ -23,6 +23,10 @@ so on the release page, but calling them out here is what tells people why.
   it from a headless server over SSH forwarding, and why a reverse proxy is
   refused.
 - This changelog, and release notes built from it.
+- Contribution docs: `CONTRIBUTING.md`, `SECURITY.md`, a code of conduct, and
+  issue and pull request templates.
+- `CLAUDE.md` and four project skills under `.claude/skills`, covering the
+  catalog, shell portability, verification and the release process.
 
 ### Changed
 

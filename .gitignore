@@ -4,3 +4,6 @@
 # Built binary
 /loadout
 /dist/
+
+# Personal Claude Code overrides; the skills in .claude/skills are shared.
+.claude/settings.local.json

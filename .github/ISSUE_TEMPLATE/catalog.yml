@@ -1,0 +1,49 @@
+name: Catalog change
+description: Add, change or remove a shipped alias, function or pack
+labels: [catalog]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The catalog is what every user gets, so the first question is whether
+        this belongs to everyone. See CONTRIBUTING.md for the four buckets and
+        docs/ALIAS-TRIAGE.md for how the original set was sorted.
+
+  - type: textarea
+    id: change
+    attributes:
+      label: The change
+      description: The alias or function, and what it expands to or does.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: bucket
+    attributes:
+      label: Where does it belong
+      options:
+        - Core — useful to nearly everyone, no personal values
+        - Pack — tied to one tool or ecosystem
+        - Config — contains something that varies per user
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      description: |
+        For an addition: who benefits, and why it is not niche enough to be a
+        pack. For a removal: what makes it a bad default.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: rules
+    attributes:
+      label: Checked against the standing decisions
+      options:
+        - label: It does not shadow a familiar command such as `ls` or `ping`
+        - label: The software it wraps is still maintained
+        - label: It contains no personal paths, hosts or org names
