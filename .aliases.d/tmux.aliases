@@ -1,0 +1,14 @@
+# Tmux ==========================================================
+alias t='tmux'
+alias tl='t ls'
+alias tn='t new -s'
+alias td='t detach'
+alias ta='t attach -t'
+alias tksv='t kill-server'
+alias tkss='t kill-session'
+alias tkp='t kill-pane'
+alias tkw='t kill-window'
+alias tsrc='t source-file ./.tmux.conf'
+# Tmux Session Persist Script
+alias tss='tmux-session save'
+alias tsr='tmux-session restore'

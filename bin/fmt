@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+
+#: Title:           fmt
+#: Date:            Fri Aug  7 2026
+#: Author:          WessCoby
+#: Version:         1.0.0
+#: Description:     Format this repo. shfmt handles the shell files (aliases,
+#:                  zsh functions, bin scripts), Prettier handles markdown.
+#:                  Usage: fmt [--staged | --check]
+#:                    (no flag)  format every tracked file
+#:                    --staged   format only staged files, then restage them
+#:                    --check    report unformatted files, write nothing
+
+# Begin Scripting
+
+set -uo pipefail
+
+# shfmt cannot discover these files on its own: a directory walk only picks up
+# *.sh or files with a shell shebang, and ours have neither. So every path is
+# passed explicitly. -ln bash is required for the same reason.
+SHFMT_FLAGS=(-ln bash -i 0 -sr -ci)
+PRETTIER_FLAGS=(--prose-wrap preserve)
+
+repo_root=$(git rev-parse --show-toplevel 2> /dev/null) || {
+	echo "fmt: not inside a git repository" >&2
+	exit 1
+}
+cd "$repo_root" || exit 1
+
+mode="all"
+case "${1:-}" in
+	--staged) mode="staged" ;;
+	--check) mode="check" ;;
+	"") ;;
+	*)
+		echo "usage: fmt [--staged | --check]" >&2
+		exit 1
+		;;
+esac
+
+# Shell files have no extension, so they are matched by path instead.
+is_shell_path() {
+	case "$1" in
+		.aliases | .aliases.d/* | zsh-functions/* | bin/*) return 0 ;;
+		*) return 1 ;;
+	esac
+}
+
+# bin/ holds committed binaries (duckdb, ngrok) that must never be formatted.
+# grep -I fails on anything that is not a text file.
+is_text() {
+	[[ -f "$1" ]] && grep -Iq . "$1" 2> /dev/null
+}
+
+if [[ "$mode" == "staged" ]]; then
+	mapfile -t candidates < <(git diff --cached --name-only --diff-filter=ACMR)
+else
+	mapfile -t candidates < <(git ls-files)
+fi
+
+shell_files=()
+md_files=()
+skipped=()
+
+for f in "${candidates[@]}"; do
+	[[ -f "$f" ]] || continue
+
+	# A file staged with further unstaged edits would have those edits swept
+	# into the commit by the restage below, so leave it alone and say so.
+	if [[ "$mode" == "staged" ]] && ! git diff --quiet -- "$f"; then
+		skipped+=("$f")
+		continue
+	fi
+
+	if [[ "$f" == *.md ]]; then
+		md_files+=("$f")
+	elif is_shell_path "$f" && is_text "$f"; then
+		shell_files+=("$f")
+	fi
+done
+
+status=0
+
+run_shfmt() {
+	((${#shell_files[@]})) || return 0
+	if ! command -v shfmt > /dev/null 2>&1; then
+		echo "fmt: shfmt not found, skipping ${#shell_files[@]} shell file(s)" >&2
+		echo "fmt: install it with 'sudo apt-get install shfmt'" >&2
+		return 0
+	fi
+	if [[ "$mode" == "check" ]]; then
+		shfmt "${SHFMT_FLAGS[@]}" -l "${shell_files[@]}" | sed 's/^/needs formatting: /'
+		return "${PIPESTATUS[0]}"
+	fi
+	shfmt "${SHFMT_FLAGS[@]}" -w "${shell_files[@]}"
+}
+
+run_prettier() {
+	((${#md_files[@]})) || return 0
+	if ! command -v prettier > /dev/null 2>&1; then
+		echo "fmt: prettier not found, skipping ${#md_files[@]} markdown file(s)" >&2
+		echo "fmt: install it with 'npm install -g prettier' (or run nig)" >&2
+		return 0
+	fi
+	if [[ "$mode" == "check" ]]; then
+		prettier "${PRETTIER_FLAGS[@]}" --check "${md_files[@]}"
+		return $?
+	fi
+	prettier "${PRETTIER_FLAGS[@]}" --write --log-level warn "${md_files[@]}"
+}
+
+run_shfmt || status=1
+run_prettier || status=1
+
+if [[ "$mode" == "staged" && "$status" -eq 0 ]]; then
+	((${#shell_files[@]})) && git add -- "${shell_files[@]}"
+	((${#md_files[@]})) && git add -- "${md_files[@]}"
+fi
+
+if ((${#skipped[@]})); then
+	echo "fmt: left alone (staged and unstaged changes in the same file):" >&2
+	printf 'fmt:   %s\n' "${skipped[@]}" >&2
+fi
+
+exit "$status"

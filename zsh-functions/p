@@ -1,0 +1,14 @@
+# Navigate to my projects directory (~/Projects) or any subdirectory,
+# or any project in any of the subdirectories (wc/qotm, wt/pkg/wesnetech, etc)
+# Example: `p wc/qotm' should take me to ~/Projects/wc/qotm
+p() {
+	if [[ -z $1 ]]; then
+		cd ~/Projects
+	else
+		if [[ -e "$HOME/Projects/$1" ]]; then
+			cd ~/Projects/$1
+		else
+			echo 'Path does not exist'
+		fi
+	fi
+}

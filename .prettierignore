@@ -1,0 +1,5 @@
+# Committed third-party binaries
+bin/duckdb
+bin/ngrok
+
+node_modules/

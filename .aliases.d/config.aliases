@@ -1,0 +1,57 @@
+# Systemctl (Linux) ============================================
+alias ctl='sudo systemctl'
+alias ctl:status='sudo systemctl status'
+alias ctl:start='sudo systemctl start'
+alias ctl:stop='sudo systemctl stop'
+alias ctl:enable='sudo systemctl enable'
+alias ctl:disable='sudo systemctl disable'
+
+# My dotfiles ===================================================
+alias .files='code ~/.bash/dotfiles'         # open this directory
+alias aka='code ~/.bash/dotfiles/.aliases'   # open with VS Code
+alias aka:n='nano ~/.bash/dotfiles/.aliases' # open with nano
+alias vars='code ~/.bash/dotfiles/.env'      # open with VS Code
+alias vars:n='nano ~/.bash/dotfiles/.env'    # open with nano
+
+# ZSH ===========================================================
+alias zcon='code ~/.zshrc'
+alias zcon:n='nano ~/.zshrc'
+alias omz='code ~/.oh-my-zsh' # directory
+alias zrc='. ~/.zshrc'        # refresh/source
+alias ezrc='exec zsh'         # hard refresh
+alias debi='sudo dpkg -i'     # linux
+
+# Directory listing/traversal ===================================
+alias downloads='cd ~/Downloads'
+alias ..='cd ..'          # one step back
+alias ...='cd ../..'      # two steps back
+alias ....='cd ../../../' # three steps back
+
+# Basic commands ================================================
+alias cl='clear'
+alias me='whoami'
+alias app='sudo apt-get'
+alias update='sudo apt-get update -y && sudo apt-get upgrade'
+alias h='history'
+alias date:now='date +"%T"'
+alias today='date +"%d-%m-%Y"'
+alias wget='wget -c'
+alias ports='netstat -tulanp'
+alias j='jobs -l'
+
+# SSH ===========================================================
+alias sa='ssh-add'
+alias sal='ssh-add -l'
+alias cg='gcfg'
+alias micasa='ssh micasa'
+alias sucasa='ssh sucasa'
+alias micaddy='ssh micaddy'
+alias sucaddy='ssh sucaddy'
+
+# IDEs ==========================================================
+alias vs='code'
+alias v='code'
+alias v.='code .'
+alias ut='/home/wc/.vscode-portable/utopia/VSCode-linux-x64/bin/code'
+alias ut.='ut .'
+alias sshcon='v ~/.ssh/config'

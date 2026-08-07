@@ -1,0 +1,15 @@
+# Navigate to my projects directory (~/Projects) or any subdirectory,
+# or any project in any of the subdirectories (wc/qotm, wt/pkg/wesnetech, etc)
+# and open directly in Visual Studio Code.
+# Example: `pv wc/qotm' should open ~/Projects/wc/qotm in VS Code
+pv() {
+	if [[ -z $1 ]]; then
+		echo 'Please specify a project name or path'
+	else
+		if [[ -e "$HOME/Projects/$1" ]]; then
+			code ~/Projects/$1
+		else
+			echo 'Project name or path does not exist'
+		fi
+	fi
+}

@@ -1,0 +1,4 @@
+# Show git config current user
+gcfg() {
+	echo "Username: $(git config user.name) | Email: $(git config user.email)"
+}

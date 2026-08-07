@@ -1,0 +1,14 @@
+# Prettier only handles the markdown here; shfmt owns every shell file.
+# See bin/fmt.
+
+# Never reflow prose. Hand-wrapped paragraphs stay as written.
+proseWrap: preserve
+endOfLine: lf
+
+# The rest of this repo is tab-indented, but markdown is the deliberate
+# exception: a tab in list-continuation is ambiguous and can silently turn a
+# nested block into a code block. Structural indentation here stays spaces.
+# Contents of fenced code blocks are untouched either way, so the tabs inside
+# the ```sh examples survive.
+useTabs: false
+tabWidth: 2

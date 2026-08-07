@@ -1,0 +1,3 @@
+alias a11='pw a11 && ta a11'
+alias a11-wb='pw a11-wb && ta a11-wb'
+alias inerds='pw inerds && ta inerds'
