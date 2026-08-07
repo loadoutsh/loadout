@@ -10,7 +10,9 @@ lenv() {
 	local env_dir
 	for env_dir in "$venv_root"/*/; do
 		if [[ -f "$env_dir/bin/activate" ]]; then
-			echo "${env_dir:t} -> $env_dir"
+			# basename rather than the zsh :t modifier, which bash ignores
+			# silently and returns the full path for.
+			echo "$(basename "$env_dir") -> $env_dir"
 		fi
 	done
 }

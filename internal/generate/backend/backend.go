@@ -26,6 +26,10 @@ type Backend interface {
 
 	// SectionHeader renders a visually distinct section break.
 	SectionHeader(title string) string
+
+	// Preamble is emitted once at the top of the generated file, for anything
+	// the dialect must enable before the rest will behave. Empty is normal.
+	Preamble() string
 }
 
 // Registry of available backends, keyed by name.

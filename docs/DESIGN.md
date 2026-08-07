@@ -2,7 +2,7 @@
 
 Turning this personal dotfiles repo into an installable CLI application for Linux and macOS, with a local web UI for managing it.
 
-Status: **Phases 0 to 6 complete.** Open questions are collected at the end.
+Status: **All seven phases complete.** Open questions are collected at the end.
 
 ## What we are building
 
@@ -16,7 +16,7 @@ A curated, opinionated shell environment that other people can install, plus the
 | Language          | Go                                    | Single static binary, cross-compiles to both platforms, `go:embed` ships the web UI inside the binary.                |
 | Web UI            | On-demand localhost server            | No daemon, no background surface. `loadout ui` starts it, closing it stops it.                                        |
 | Shell integration | Generated file, sourced               | Zero process spawn per shell start, and `p`/`activate` stay real shell functions.                                     |
-| Shells            | zsh only in v1, pluggable backends    | zsh is the macOS default and what we use. The interface exists from day one so bash can be added without a rewrite.   |
+| Shells            | zsh and bash, pluggable backends      | The interface existed from day one, so adding bash was a new file rather than a rewrite.                              |
 | Secrets           | OS keychain                           | Keychain on macOS, libsecret on Linux. Secrets never land in a file.                                                  |
 | Name              | `loadout`                             | A deliberately configured kit you swap per context. No collision on PATH, in apt, or in brew. Searchable and ownable. |
 | Repo              | New repo, fresh history               | Leaves 61MB of committed binaries behind in the archive rather than carrying them forward.                            |
@@ -347,6 +347,21 @@ Three channels:
 | 7     | bash backend, which validates that the backend abstraction actually holds.              |
 
 Phase 0 is the honest test of the whole design: if the generator can reproduce the current environment exactly, everything after it is additive.
+
+## What the bash backend proved
+
+The backend abstraction held: bash was one new file, and every alias line the two backends emit is byte-identical. Only the preamble differs, because bash expands aliases in interactive shells only and needs `shopt -s expand_aliases` where zsh needs nothing.
+
+The abstraction was never the risk, though. The risk was in the function bodies, and adding a second shell found four things that had been wrong all along:
+
+| Construct                                   | What bash does                                              |
+| ------------------------------------------- | ----------------------------------------------------------- |
+| `${=pids}` in `kp`                          | Rejects it: bad substitution                                |
+| `${env_dir:t}` in `lenv`                    | **Silently returns the whole path** instead of the basename |
+| `local -A` in `pw`                          | Works on bash 4, fails on the 3.2 macOS ships               |
+| `getopts` without resetting OPTIND in `msh` | Silently ignores flags on every call after the first        |
+
+The middle two are the instructive ones. Neither is a syntax error, so the generated file passed `bash -n` cleanly while being wrong at runtime — one of them by returning a plausible wrong answer rather than failing. Templates are now written in the intersection of both dialects, with tests forbidding each construct's return.
 
 ## Open questions
 

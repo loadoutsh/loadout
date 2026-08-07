@@ -5,12 +5,17 @@ kp() {
 		return 1
 	fi
 
-	local pids
-	pids=$(sudo lsof -t -i:"$1")
-	if [[ -z $pids ]]; then
+	local found=0 pid
+	# Command substitution in a for loop word-splits in both zsh and bash.
+	# ${=pids} would have been zsh-only, and bash rejects it outright.
+	for pid in $(sudo lsof -t -i:"$1" 2> /dev/null); do
+		sudo kill -9 "$pid"
+		found=$((found + 1))
+	done
+
+	if [[ $found -eq 0 ]]; then
 		echo "Nothing is listening on port $1"
 		return 1
 	fi
-
-	sudo kill -9 ${=pids}
+	echo "Killed $found process(es) on port $1"
 }

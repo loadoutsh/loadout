@@ -105,7 +105,7 @@ Nothing outside ~/.config/loadout is touched.`,
 		},
 	}
 
-	cmd.Flags().StringVar(&shell, "shell", "zsh", "shell dialect to generate")
+	cmd.Flags().StringVar(&shell, "shell", "zsh", "shell dialect to generate (zsh, bash)")
 	cmd.Flags().StringVar(&goos, "platform", runtime.GOOS, "target platform (linux, darwin)")
 	cmd.Flags().BoolVar(&stdout, "stdout", false, "write to stdout instead of the config directory")
 	cmd.Flags().StringVar(&out, "out", "", "write to this path instead of the default")

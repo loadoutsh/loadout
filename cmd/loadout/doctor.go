@@ -206,10 +206,23 @@ func checkConfig(rep *report, cfg *config.Config, err error) {
 	}
 }
 
+// generatedShell reports which dialect has been applied on this machine,
+// preferring whatever the user's login shell is.
+func generatedShell() string {
+	if strings.Contains(os.Getenv("SHELL"), "bash") {
+		if p, err := generate.OutputPath("bash"); err == nil {
+			if _, statErr := os.Stat(p); statErr == nil {
+				return "bash"
+			}
+		}
+	}
+	return "zsh"
+}
+
 // checkGenerated catches the most common confusion: config edited, apply not
 // run, and the shell still sourcing yesterday's output.
 func checkGenerated(rep *report, cfg *config.Config) {
-	genPath, err := generate.OutputPath("zsh")
+	genPath, err := generate.OutputPath(generatedShell())
 	if err != nil {
 		rep.add("Generated output", finding{bad, "cannot determine output path", err.Error()})
 		return
@@ -231,7 +244,8 @@ func checkGenerated(rep *report, cfg *config.Config) {
 
 // checkShellIntegration looks for the source line in the user's shell rc.
 func checkShellIntegration(rep *report) {
-	genPath, err := generate.OutputPath("zsh")
+	shell := generatedShell()
+	genPath, err := generate.OutputPath(shell)
 	if err != nil {
 		return
 	}
@@ -240,18 +254,21 @@ func checkShellIntegration(rep *report) {
 		return
 	}
 	rc := filepath.Join(home, ".zshrc")
+	if shell == "bash" {
+		rc = filepath.Join(home, ".bashrc")
+	}
 	data, err := os.ReadFile(rc)
 	if err != nil {
-		rep.add("Shell integration", finding{warn, "could not read ~/.zshrc", err.Error()})
+		rep.add("Shell integration", finding{warn, "could not read " + rc, err.Error()})
 		return
 	}
 	// Match on the file name rather than the whole path, so a config dir moved
 	// via XDG_CONFIG_HOME does not read as missing integration.
 	if strings.Contains(string(data), filepath.Base(genPath)) {
-		rep.add("Shell integration", finding{ok, "~/.zshrc sources the generated file", ""})
+		rep.add("Shell integration", finding{ok, rc + " sources the generated file", ""})
 		return
 	}
-	rep.add("Shell integration", finding{warn, "~/.zshrc does not source the generated file",
+	rep.add("Shell integration", finding{warn, rc + " does not source the generated file",
 		fmt.Sprintf("add:  source %s", genPath)})
 }
 

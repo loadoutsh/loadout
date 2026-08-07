@@ -134,8 +134,12 @@ NEW_SRC="source '$GENERATED'"
 behaves() {
 	local label="$1" snippet="$2"
 	local a b
-	a=$(zsh -c "$STUBS; $OLD_SRC; $snippet" 2>&1)
-	b=$(zsh -c "$STUBS; $NEW_SRC; $snippet" 2>&1)
+	a=$(zsh -c "$STUBS
+$OLD_SRC
+$snippet" 2>&1)
+	b=$(zsh -c "$STUBS
+$NEW_SRC
+$snippet" 2>&1)
 	if [[ "$a" == "$b" ]]; then
 		say "PASS  $label"
 	else
@@ -165,6 +169,69 @@ behaves "venv requires a name" 'venv 3.12'
 behaves "kp requires a port" 'kp'
 
 say ""
+
+# --- bash backend -----------------------------------------------------------
+#
+# The bash backend exists to prove the abstraction holds. Generating is not
+# enough: the earlier zsh-only constructs all *parsed* as bash and failed only
+# at runtime, one of them by silently returning a wrong value. So compare
+# behaviour between the two generated files, not just that both parse.
+
+GENERATED_BASH="$WORK/xdg/loadout/init.bash"
+
+if [[ -f "$GENERATED_BASH" ]]; then
+	say "bash backend:"
+
+	if bash -n "$GENERATED_BASH" 2> "$WORK/bash-syntax.err"; then
+		say "PASS  generated bash parses as bash"
+	else
+		say "FAIL  generated bash is not valid bash:"
+		sed 's/^/      /' "$WORK/bash-syntax.err"
+		fail=1
+	fi
+
+	# The alias lines themselves must be byte-identical; only the preamble
+	# differs between backends.
+	if diff <(grep '^alias ' "$GENERATED" | sort) \
+		<(grep '^alias ' "$GENERATED_BASH" | sort) > "$WORK/backend.diff"; then
+		say "PASS  alias lines identical across backends"
+	else
+		say "FAIL  backends emit different aliases:"
+		sed 's/^/      /' "$WORK/backend.diff" | head -20
+		fail=1
+	fi
+
+	cross() {
+		local label="$1" snippet="$2"
+		local a b
+		a=$(zsh -c "$STUBS
+source '$GENERATED'
+$snippet" 2>&1)
+		b=$(bash -c "$STUBS
+source '$GENERATED_BASH'
+$snippet" 2>&1)
+		if [[ "$a" == "$b" ]]; then
+			say "PASS  $label"
+		else
+			say "FAIL  $label"
+			say "      zsh : $a"
+			say "      bash: $b"
+			fail=1
+		fi
+	}
+
+	cross "pw resolves workspaces the same way" \
+		'for k in a11 a11-wb inerds snipify bogus; do pw $k; done'
+	cross "wt behaves the same" 'wt api-starter server'
+	cross "gcfg behaves the same" 'gcfg'
+	cross "p rejects a missing path the same" 'p definitely/not/here'
+	cross "venv argument checks match" 'venv; venv 3.12'
+	cross "kp argument check matches" 'kp'
+	cross "activate rejects a missing venv the same" 'activate nope'
+
+	say ""
+fi
+
 if ((fail == 0)); then
 	say "PARITY OK"
 else

@@ -99,12 +99,56 @@ func TestNoUnexpandedTildeInQuotes(t *testing.T) {
 	}
 }
 
-// Associative array keys must stay quoted; unquoted, shfmt rewrites a key like
-// [a11-wb] into [a11 - wb] and the lookup silently breaks.
-func TestWorkspaceKeysAreQuoted(t *testing.T) {
+// pw used an associative array, which needs bash 4 while macOS ships 3.2, and
+// whose unquoted subscripts shfmt would rewrite as arithmetic ([a11-wb] became
+// [a11 - wb]). A case statement avoids both problems, so no associative array
+// may reappear in the generated output.
+func TestNoAssociativeArrays(t *testing.T) {
 	rendered := render(t, loadFixture(t), "linux")
-	if !strings.Contains(rendered, `["a11-wb"]=`) {
-		t.Error("workspace key a11-wb is not quoted in the generated output")
+	for _, banned := range []string{"local -A", "typeset -A", "declare -A"} {
+		if strings.Contains(rendered, banned) {
+			t.Errorf("generated output uses %q, which bash 3.2 on macOS cannot parse", banned)
+		}
+	}
+}
+
+// A workspace name containing a hyphen must still resolve. This is the case
+// the old associative-array implementation kept getting wrong.
+func TestHyphenatedWorkspaceResolves(t *testing.T) {
+	rendered := render(t, loadFixture(t), "linux")
+	if !strings.Contains(rendered, "a11-wb) target=") {
+		t.Error("hyphenated workspace a11-wb has no case branch in the generated pw")
+	}
+}
+
+// The zsh-only constructs that bash either rejects or, worse, silently
+// misinterprets must not come back.
+func TestNoZshOnlyConstructs(t *testing.T) {
+	banned := map[string]string{
+		"${=": "zsh-only word splitting; bash reports a bad substitution",
+		":t}": "zsh tail modifier; bash silently returns the whole path instead",
+	}
+	for _, line := range strings.Split(render(t, loadFixture(t), "linux"), "\n") {
+		// Comments explaining these constructs mention them by name, which is
+		// not the same as using them.
+		if strings.HasPrefix(strings.TrimSpace(line), "#") {
+			continue
+		}
+		for construct, why := range banned {
+			if strings.Contains(line, construct) {
+				t.Errorf("generated code contains %q: %s\n  %s", construct, why, strings.TrimSpace(line))
+			}
+		}
+	}
+}
+
+// zsh makes OPTIND local to a function automatically; bash does not, so
+// without an explicit reset a second call silently ignores its flags.
+func TestGetoptsResetsOptind(t *testing.T) {
+	rendered := render(t, loadFixture(t), "linux")
+	if strings.Contains(rendered, "getopts") && !strings.Contains(rendered, "OPTIND=1") {
+		t.Error("a function uses getopts without resetting OPTIND; in bash its flags " +
+			"would be ignored on every call after the first")
 	}
 }
 

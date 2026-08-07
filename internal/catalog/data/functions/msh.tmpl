@@ -18,7 +18,9 @@ Usage: msh [-k keyfile] [-u user] [-m machine] [-p port] [-h]
 
 Configured host aliases: {{ .HostAliases }}"
 
-	local opt
+	# zsh makes OPTIND local to a function; bash does not, so without this a
+	# second call to msh in the same shell silently ignores its flags.
+	local opt OPTIND=1
 	while getopts ":k:p:u:m:h" opt; do
 		case $opt in
 			k) keyfile="$OPTARG" ;;

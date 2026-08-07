@@ -119,6 +119,11 @@ func (g *Generator) writeHeader(b *bytes.Buffer) {
 	fmt.Fprintln(b, g.be.Comment("Edit ~/.config/loadout/config.yaml, then run 'loadout apply'."))
 	fmt.Fprintln(b, g.be.Comment(fmt.Sprintf("shell=%s platform=%s", g.opt.Shell, g.opt.GOOS)))
 	fmt.Fprintln(b)
+
+	if pre := g.be.Preamble(); pre != "" {
+		fmt.Fprintln(b, pre)
+		fmt.Fprintln(b)
+	}
 }
 
 // enabledPacks is the set of packs the user has switched on.
