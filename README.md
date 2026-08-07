@@ -147,6 +147,89 @@ That `eval` is a deliberate cost. Baking secrets into the generated file would p
 
 An identity can nominate credential entries, so `s work` switches your git author, your SSH key and your tokens in one command.
 
+## The web interface
+
+```sh
+loadout ui
+```
+
+Starts a small server on `127.0.0.1`, opens your browser, and stops when you
+stop the command. There is no daemon and nothing left running afterwards.
+
+It gives you the alias catalog with live availability — every alias shown with
+whether the tool it needs is actually installed on this machine — plus pack
+toggles, credential switching, the command reference, and a diff of the
+generated shell file before anything is written. A flat config file cannot tell you
+which of your aliases point at tools you never installed; this can.
+
+### Why it is bound to loopback
+
+This interface rewrites the file your shell sources on every login. That makes
+it, in effect, a remote code execution API for your account. Binding to
+`127.0.0.1` keeps other machines out, but it does not keep other _pages_ out:
+any site open in your browser can issue requests to localhost. Three checks run
+before any request is served.
+
+- **A per-run token.** Generated at startup, compared in constant time, and
+  gone when the server stops. It reaches the page in the query string, because
+  a browser navigation cannot set a header, and the page moves it into
+  `sessionStorage` and strips it from the URL so it does not linger in your
+  address bar or history.
+- **Origin must be ours.** A request carrying any other site's `Origin` is
+  refused before the token is even considered.
+- **Host must be loopback.** This is the defence against DNS rebinding, where
+  an attacker points a hostname they control at `127.0.0.1` so your browser
+  treats their page as same-origin. Their hostname will not match.
+
+Static assets are the one exception: `app.css` and `app.js` are served without
+a token, because a `<link>` or `<script>` tag cannot present one. They are
+inert files compiled into the binary and identical for every user. Everything
+that reads your configuration or writes to disk is behind the token.
+
+**Treat the printed URL as a secret** for as long as the server is running.
+
+### On a server with no browser
+
+Use SSH port forwarding. This is the intended answer, and it needs no
+configuration.
+
+```sh
+# on the server
+loadout ui --port 8800 --no-open --print-url
+
+# on your laptop, in another terminal
+ssh -L 8800:127.0.0.1:8800 you@server
+```
+
+Then open the URL the server printed. Your browser connects to `127.0.0.1` on
+your own machine, SSH carries the traffic, and nothing listens on a public
+interface. The `Host` header is loopback, so the checks above pass unchanged.
+
+`--no-open` stops it trying to launch a browser that is not there.
+`--print-url` prints only the URL, for scripting.
+
+### Why there is no reverse proxy support
+
+Putting the interface behind `https://loadout.example.com` does not work, by
+design. A proxy sends `Host: loadout.example.com`, the loopback check refuses
+it, and the request gets a 403 before reaching any handler.
+
+Allowing a configured hostname would be a small change. It is deliberately not
+offered, because that `Host` check is the DNS rebinding defence, and removing
+it leaves a single per-run token in a URL as the only thing between the public
+internet and an API that rewrites what your shell executes at every login.
+URLs leak: through browser history, referrer headers, proxy logs, screen
+shares. A leaked token here is not an information disclosure, it is arbitrary
+code execution on that machine the next time you open a terminal. The token is
+also valid for the entire life of the process, with no revocation and no audit
+trail.
+
+If you genuinely need a remote interface, the authentication has to live in
+front of it — mTLS, an OAuth proxy, or at the very least HTTP basic auth over
+TLS — and you should treat that as running an admin panel for your shell,
+because that is what it is. SSH forwarding gives you the same access, over a
+credential you already have, with nothing new exposed.
+
 ## Binaries and scripts
 
 Third-party executables are declared, not committed, and fetched per platform into a managed directory that loadout appends to your `PATH`.
