@@ -2,7 +2,7 @@
 
 Turning this personal dotfiles repo into an installable CLI application for Linux and macOS, with a local web UI for managing it.
 
-Status: **Phases 0 to 5 complete.** Open questions are collected at the end.
+Status: **Phases 0 to 6 complete.** Open questions are collected at the end.
 
 ## What we are building
 
@@ -310,7 +310,28 @@ Not a port flag. Real behavioural differences to resolve in the catalog, roughly
 | `lsof -t -i:` in `kp`   | differs in flag handling |
 | `wg-quick`, `openvpn3`  | different tooling        |
 
-The catalog needs per-platform variants, not a single command string.
+The catalog needs per-platform variants, not a single command string. Generating for `darwin` now yields 158 aliases against Linux's 166: `debi` and the openvpn and wireguard entries drop out entirely, and eleven resolve differently.
+
+Tool _names_ were the easy half. The subtler risk is a command that exists on both and behaves differently. `sshp` used `find -regex`, whose flavour differs on BSD, and it matched only `*rsa` and `*.pem` — silently skipping every ed25519 key. It is now POSIX `sh` with a shell loop that identifies a private key by its content rather than its name.
+
+One thing this audit flagged for later: `pw` uses `local -A`, an associative array. Fine for zsh, but macOS ships bash 3.2, which has no associative arrays. The bash backend will need a different implementation there.
+
+## Distribution
+
+Release builds are plain `go build` with `GOOS`/`GOARCH`. There is no cgo in any package, so nothing needs a build container or a release tool.
+
+```sh
+make build       # current platform
+make check       # build, vet, test, format
+make parity      # prove the generator still matches the original files
+make release     # all four platforms into dist/ with checksums
+```
+
+Three channels:
+
+- `install.sh`, POSIX sh so it runs on a minimal server, which verifies the published checksum before putting anything on PATH and installs via a rename so an interrupted run cannot leave a half-written executable behind. `LOADOUT_BASE_URL` points it at a mirror.
+- A Homebrew formula in `packaging/homebrew`.
+- `go install` for anyone with a toolchain.
 
 ## Phasing
 

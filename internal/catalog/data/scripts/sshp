@@ -1,18 +1,55 @@
-#!/bin/bash
+#!/bin/sh
 
 #: Title:           sshp
-#: Date:            Sun Aug 28 13:46:53 GMT 2022
-#: Author:          WessCoby
-#: Version:         1.0.0
-#: Description:     Assign correct permissions for ssh keys
+#: Version:         2.0.0
+#: Description:     Set correct permissions on everything in ~/.ssh.
+#:                  ssh refuses to use a private key that others can read.
 
-# Begin Scripting
+# POSIX sh and a shell loop rather than find -regex: BSD find on macOS uses a
+# different regex flavour, and the previous version matched only *rsa and
+# *.pem, which silently skipped every ed25519 key.
 
-if [[ -d "$HOME/.ssh" ]]; then
-	chmod 700 "$HOME/.ssh"
-	find "$HOME/.ssh" -type f -regex ".*rsa$" -exec chmod 600 {} \; -o -regex ".*\.pem" -exec chmod 600 {} \;
-	find "$HOME/.ssh" -type f -regex ".*pub$" -exec chmod 644 {} \;
-	echo "Permissions modified successfully"
-else
-	echo "Directory does not exist"
+set -u
+
+ssh_dir="$HOME/.ssh"
+
+if [ ! -d "$ssh_dir" ]; then
+	echo "No $ssh_dir directory" >&2
+	exit 1
 fi
+
+chmod 700 "$ssh_dir"
+
+changed=0
+for path in "$ssh_dir"/*; do
+	# The glob yields itself when the directory is empty.
+	[ -e "$path" ] || continue
+	[ -f "$path" ] || continue
+
+	name="${path##*/}"
+	case "$name" in
+		*.pub)
+			mode=644
+			;;
+		config | known_hosts | known_hosts.* | *known_hosts | authorized_keys | authorized_keys2)
+			mode=600
+			;;
+		*)
+			# Anything else is treated as a private key only if it looks like
+			# one. Identifying by content rather than by filename is what makes
+			# this work for ed25519, ecdsa and anything named unconventionally.
+			if head -n 1 "$path" 2> /dev/null | grep -q "PRIVATE KEY"; then
+				mode=600
+			else
+				continue
+			fi
+			;;
+	esac
+
+	current=$(ls -l "$path" | cut -c1-10)
+	chmod "$mode" "$path"
+	changed=$((changed + 1))
+	printf '  %-32s %s  (was %s)\n' "$name" "$mode" "$current"
+done
+
+echo "Adjusted $changed file(s) in $ssh_dir"
