@@ -1,0 +1,146 @@
+# Metadata for the shipped functions.
+#
+# One declaration per function feeds three things: the setup instructions
+# `loadout describe` prints, the status `loadout doctor` reports, and the
+# per-entry indicator the web UI will show. They cannot drift apart because
+# there is only one of them.
+#
+# requires:  "<binary>" | "path:<path>" | "config:<section>"
+# config:    config keys that shape this function, listed for describe
+functions:
+  - name: p
+    summary: Change directory to a project under your projects root.
+    usage: |
+      p              # go to the projects root
+      p wc/qotm      # go to <root>/wc/qotm
+    requires:
+      - path:{{project_root}}
+    config: [paths.project_root]
+    notes: |
+      Runs in your shell rather than as a subprocess, because a child process
+      cannot change the directory of the shell that started it.
+
+  - name: pv
+    summary: Open a project from your projects root in your editor.
+    usage: |
+      pv wc/qotm     # open <root>/wc/qotm
+    requires:
+      - path:{{project_root}}
+      - config:editors
+    config: [paths.project_root, editors]
+
+  - name: pw
+    summary: Open a named editor workspace, or any project by path.
+    usage: |
+      pw a11         # open the workspace named a11
+      pw wc/qotm     # falls back to a path under the projects root
+    requires:
+      - config:workspaces
+      - config:editors
+    config: [workspaces, editors, paths.project_root]
+    notes: |
+      Each workspace with a tmux_session also gets an alias of the same name
+      that opens the workspace and attaches to the session.
+
+  - name: s
+    summary: Switch the global git identity and the SSH key that goes with it.
+    usage: |
+      s              # switch to the default identity
+      s wc           # switch to the identity with id "wc"
+    requires:
+      - git
+      - ssh-add
+      - config:identities
+    config: [identities]
+    notes: |
+      Clears the agent before adding the new key, so only one identity's key
+      is loaded at a time. An identity can also nominate which credential
+      entries become active, via its `activates` map.
+
+  - name: gcfg
+    summary: Print the git identity currently in effect.
+    usage: gcfg
+    requires: [git]
+
+  - name: clone-sources
+    named_by: clone_sources
+    summary: Clone a repository from a configured organisation.
+    usage: |
+      <alias> api-starter          # clone <org>/api-starter
+      <alias> api-starter server   # clone into ./server
+    requires:
+      - gh
+      - config:clone_sources
+    config: [clone_sources]
+    notes: |
+      This is not one command but a family. One function is generated per
+      entry in clone_sources, named after that entry's alias, so the command
+      names come from your config rather than from the catalog. Requires the
+      GitHub CLI to be authenticated.
+
+  - name: msh
+    summary: SSH to a configured host, a bare last octet, or any hostname.
+    usage: |
+      msh                     # connect using the configured defaults
+      msh -m api              # connect to the host aliased "api"
+      msh -m 5                # connect to <subnet_prefix>5
+      msh -k mykey -u ubuntu -p 2222
+      msh -h                  # full flag reference
+    requires:
+      - ssh
+      - config:hosts
+    config: [hosts, ssh]
+
+  - name: mpush
+    summary: Upload a file to a configured remote host over scp.
+    usage: |
+      mpush api ./build.tar             # upload to the host's default path
+      mpush api ./build.tar /srv/app    # upload to a specific path
+    requires:
+      - scp
+      - config:hosts
+    config: [hosts]
+
+  - name: venv
+    summary: Create a Python virtual environment under your venv root.
+    usage: venv 3.12 myproject
+    requires:
+      - path:{{venv_root}}
+    config: [paths.venv_root]
+
+  - name: activate
+    summary: Activate a Python virtual environment.
+    usage: activate myproject
+    requires:
+      - path:{{venv_root}}
+    config: [paths.venv_root]
+    notes: |
+      Runs in your shell rather than as a subprocess, because activation works
+      by sourcing a script into the current shell.
+
+  - name: denv
+    summary: Delete a Python virtual environment.
+    usage: denv myproject
+    requires:
+      - path:{{venv_root}}
+    config: [paths.venv_root]
+
+  - name: lenv
+    summary: List the virtual environments under your venv root.
+    usage: lenv
+    requires:
+      - path:{{venv_root}}
+    config: [paths.venv_root]
+
+  - name: nig
+    summary: Install your configured global npm packages.
+    usage: nig
+    requires: [npm]
+    config: [npm_globals]
+
+  - name: kp
+    summary: Kill whatever process is listening on a port.
+    usage: kp 3000
+    requires: [lsof]
+    notes: |
+      Uses sudo, since the listening process is often not yours.

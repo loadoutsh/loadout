@@ -99,3 +99,7 @@ func managedBinDir() (string, error) {
 	}
 	return filepath.Join(home, ".local", "share", "loadout", "bin"), nil
 }
+
+// hostGOOS is the platform loadout is running on. Wrapped so tests and the
+// --platform flag are the only places that vary it.
+func hostGOOS() string { return runtime.GOOS }

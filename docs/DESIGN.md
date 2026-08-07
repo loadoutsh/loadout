@@ -2,7 +2,7 @@
 
 Turning this personal dotfiles repo into an installable CLI application for Linux and macOS, with a local web UI for managing it.
 
-Status: **Phase 0 complete.** Open questions are collected at the end.
+Status: **Phases 0 and 1 complete.** Open questions are collected at the end.
 
 ## What we are building
 
@@ -62,7 +62,7 @@ internal/
   generate/            rendering                            ✓
     backend/           Backend interface; zsh               ✓
   credentials/         keychain abstraction
-  requires/            capability checks for doctor and UI
+  requires/            capability checks for doctor and describe    ✓
   server/              localhost web UI
 web/                   UI source, built and embedded
 testdata/parity/       fixture config + verify.sh           ✓

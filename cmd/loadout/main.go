@@ -11,7 +11,11 @@ var Version = "dev"
 
 func main() {
 	if err := newRootCmd().Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, "error:", err)
+		// A command that has already reported its own findings returns an
+		// error with no message, to set the exit code without saying so twice.
+		if err.Error() != "" {
+			fmt.Fprintln(os.Stderr, "error:", err)
+		}
 		os.Exit(1)
 	}
 }
