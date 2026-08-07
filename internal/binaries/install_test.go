@@ -151,7 +151,7 @@ func TestChecksumVerified(t *testing.T) {
 	rec, err := inst.Install(config.Binary{
 		Name:     "tool",
 		Version:  "v1.0",
-		Checksum: "sha256:" + sum(asset),
+		Checksum: config.Checksum{Any: "sha256:" + sum(asset)},
 		Source:   config.BinarySource{URL: map[string]string{Current().Key(): url}},
 	}, Current())
 	if err != nil {
@@ -171,7 +171,7 @@ func TestChecksumMismatchRejects(t *testing.T) {
 	_, err := inst.Install(config.Binary{
 		Name:     "tool",
 		Version:  "v1.0",
-		Checksum: "sha256:" + strings.Repeat("0", 64),
+		Checksum: config.Checksum{Any: "sha256:" + strings.Repeat("0", 64)},
 		Source:   config.BinarySource{URL: map[string]string{Current().Key(): url}},
 	}, Current())
 	if err == nil {
@@ -418,5 +418,70 @@ func TestRefusesHTTPRedirect(t *testing.T) {
 	}
 	if _, statErr := os.Stat(filepath.Join(inst.BinDir, "tool")); statErr == nil {
 		t.Error("nothing should have been installed")
+	}
+}
+
+// A hash describes one platform's artefact. A per-platform map must be
+// consulted by the platform actually being installed, or a multi-platform
+// config would fail everywhere except the machine the hash was taken on.
+func TestPerPlatformChecksum(t *testing.T) {
+	asset := makeZip(t, "tool", []byte(payload))
+	inst, url := harness(t, "tool.zip", asset)
+
+	decl := config.Binary{
+		Name:    "tool",
+		Version: "v1.0",
+		Source:  config.BinarySource{URL: map[string]string{Current().Key(): url}},
+		Checksum: config.Checksum{ByPlatform: map[string]string{
+			Current().Key(): "sha256:" + sum(asset),
+			// A deliberately wrong hash for a platform we are not on: it must
+			// be ignored rather than compared.
+			"plan9-386": "sha256:" + strings.Repeat("f", 64),
+		}},
+	}
+	rec, err := inst.Install(decl, Current())
+	if err != nil {
+		t.Fatalf("install: %v", err)
+	}
+	if !rec.Verified {
+		t.Error("the matching per-platform hash should have marked this verified")
+	}
+}
+
+// A per-platform map with no entry for this platform means nothing is pinned
+// here, which is unverified rather than a failure.
+func TestChecksumAbsentForThisPlatform(t *testing.T) {
+	asset := makeZip(t, "tool", []byte(payload))
+	inst, url := harness(t, "tool.zip", asset)
+
+	rec, err := inst.Install(config.Binary{
+		Name:   "tool",
+		Source: config.BinarySource{URL: map[string]string{Current().Key(): url}},
+		Checksum: config.Checksum{ByPlatform: map[string]string{
+			"plan9-386": "sha256:" + strings.Repeat("f", 64),
+		}},
+	}, Current())
+	if err != nil {
+		t.Fatalf("install should succeed unverified, got: %v", err)
+	}
+	if rec.Verified {
+		t.Error("no hash pinned for this platform, so it cannot be verified")
+	}
+}
+
+// A wrong per-platform hash for the platform being installed must still stop it.
+func TestPerPlatformChecksumMismatchRejects(t *testing.T) {
+	asset := makeZip(t, "tool", []byte(payload))
+	inst, url := harness(t, "tool.zip", asset)
+
+	_, err := inst.Install(config.Binary{
+		Name:   "tool",
+		Source: config.BinarySource{URL: map[string]string{Current().Key(): url}},
+		Checksum: config.Checksum{ByPlatform: map[string]string{
+			Current().Key(): "sha256:" + strings.Repeat("0", 64),
+		}},
+	}, Current())
+	if err == nil || !strings.Contains(err.Error(), "checksum mismatch") {
+		t.Errorf("error = %v, want a checksum mismatch", err)
 	}
 }

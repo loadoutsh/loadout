@@ -171,12 +171,18 @@ func (i *Installer) Install(b config.Binary, p Platform) (Record, error) {
 	}
 
 	verified := false
-	if want := strings.TrimPrefix(b.Checksum, "sha256:"); want != "" && want != "..." {
-		if !strings.EqualFold(want, sum) {
-			return Record{}, fmt.Errorf("%s: checksum mismatch\n  want sha256:%s\n  got  sha256:%s",
-				b.Name, want, sum)
+	// A hash describes one platform's artefact, so the one for the platform
+	// actually being installed is what must match.
+	if pinned, ok := b.Checksum.For(matchedKey); ok {
+		want := strings.TrimPrefix(pinned, "sha256:")
+		if want != "" && want != "..." {
+			if !strings.EqualFold(want, sum) {
+				return Record{}, fmt.Errorf("%s: checksum mismatch for %s\n  want sha256:%s\n  got  sha256:%s\n"+
+					"Either the download was tampered with, or upstream published a new build at the same URL.",
+					b.Name, matchedKey, want, sum)
+			}
+			verified = true
 		}
-		verified = true
 	}
 
 	dst := filepath.Join(i.BinDir, b.Name)

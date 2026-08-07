@@ -113,8 +113,64 @@ type Binary struct {
 	Name     string       `yaml:"name"`
 	Version  string       `yaml:"version"`
 	Source   BinarySource `yaml:"source"`
-	Checksum string       `yaml:"checksum,omitempty"`
+	Checksum Checksum     `yaml:"checksum,omitempty"`
 }
+
+// Checksum pins the expected hash of a download.
+//
+// A hash only describes one platform's artefact, so a bare string would be
+// wrong everywhere except the machine it was taken on. Both forms are
+// accepted: a single string when only one platform is used, or a map keyed by
+// "<os>-<arch>" when the binary is declared for several.
+//
+//	checksum: sha256:abc...
+//
+//	checksum:
+//	  linux-amd64: sha256:abc...
+//	  darwin-arm64: sha256:def...
+type Checksum struct {
+	// Any applies to every platform. Empty when per-platform hashes are used.
+	Any string
+	// ByPlatform is keyed by "<os>-<arch>".
+	ByPlatform map[string]string
+}
+
+// UnmarshalYAML accepts either a scalar or a mapping.
+func (c *Checksum) UnmarshalYAML(value *yaml.Node) error {
+	switch value.Kind {
+	case yaml.ScalarNode:
+		return value.Decode(&c.Any)
+	case yaml.MappingNode:
+		return value.Decode(&c.ByPlatform)
+	default:
+		return fmt.Errorf("checksum must be a string or a map keyed by platform")
+	}
+}
+
+// MarshalYAML writes back whichever form was given.
+func (c Checksum) MarshalYAML() (any, error) {
+	if len(c.ByPlatform) > 0 {
+		return c.ByPlatform, nil
+	}
+	if c.Any != "" {
+		return c.Any, nil
+	}
+	return nil, nil
+}
+
+// For returns the expected hash for a platform key, and whether one is pinned.
+func (c Checksum) For(platformKey string) (string, bool) {
+	if v, ok := c.ByPlatform[platformKey]; ok && v != "" {
+		return v, true
+	}
+	if c.Any != "" {
+		return c.Any, true
+	}
+	return "", false
+}
+
+// IsZero reports whether nothing is pinned at all.
+func (c Checksum) IsZero() bool { return c.Any == "" && len(c.ByPlatform) == 0 }
 
 // BinarySource is either a GitHub release or a set of direct URLs, keyed by
 // "<os>-<arch>".
