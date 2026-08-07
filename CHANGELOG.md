@@ -14,6 +14,8 @@ so on the release page, but calling them out here is what tells people why.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-08-07
+
 ### Added
 
 - `env:` on a credential, setting the environment variable it exports when the
@@ -59,5 +61,6 @@ First release.
   anything that looks like a live credential.
 - `update` and `uninstall`, both aware of how loadout was installed.
 
-[unreleased]: https://github.com/loadoutsh/loadout/compare/v0.1.0...HEAD
+[unreleased]: https://github.com/loadoutsh/loadout/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/loadoutsh/loadout/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/loadoutsh/loadout/releases/tag/v0.1.0
