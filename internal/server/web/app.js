@@ -326,6 +326,11 @@ function renderCredentials() {
     return;
   }
 
+  // Storing a value here writes to the keychain, not to anyone's shell, and
+  // that surprises people: the tab shows a credential set, `loadout env`
+  // lists it, and `echo $NPM_TOKEN` is still empty. Say so here rather than
+  // only after an identity switch, because setting a value is the first
+  // thing most people do on this tab.
   root.append(
     el(
       "div",
@@ -334,8 +339,23 @@ function renderCredentials() {
       el(
         "div",
         { className: "muted" },
-        `Values live in ${STATE.keyring} and are never sent to this page — only whether a value exists. ` +
-          `After switching, run: eval "$(loadout env)"`,
+        `Values live in ${STATE.keyring} and are never sent to this page — only whether a value exists.`,
+      ),
+      el(
+        "div",
+        { className: "muted note" },
+        "Storing or switching a value here does not reach a shell on its own. ",
+        el("code", {}, "loadout env"),
+        " prints export lines; it cannot set them, because a child process " +
+          "cannot change its parent's environment. The ",
+        el("code", {}, "eval"),
+        " is what applies them, and only to the shell that runs it.",
+      ),
+      el(
+        "pre",
+        {},
+        'eval "$(loadout env)"           # this shell\n' +
+          'eval "$(loadout env --quiet)"   # every shell: add below the source line',
       ),
     ),
   );

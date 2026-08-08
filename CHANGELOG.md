@@ -22,6 +22,14 @@ so on the release page, but calling them out here is what tells people why.
   transparent and disappears in a dark tab strip.
 - A banner on the README.
 
+### Changed
+
+- The Credentials tab and the README now state why `loadout env` on its own
+  sets nothing: it prints export lines, and `eval` is what applies them. This
+  was reported as a bug, which is a fair reading of documentation that
+  mentioned the `eval` only in passing and, in the UI, only after an identity
+  switch. No behaviour changed.
+
 ## [0.2.0] - 2026-08-07
 
 ### Added

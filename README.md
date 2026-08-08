@@ -43,6 +43,10 @@ source ~/.config/loadout/init.zsh
 
 loadout never edits your shell config for you. That line is yours to add.
 
+That line brings in the aliases and functions. It does not bring in your
+credentials — those need a second line, and
+[Credentials](#credentials) explains why and what it costs.
+
 ## How it works
 
 ```
@@ -68,7 +72,7 @@ Two of the shipped functions, `p` and `activate`, change your shell's directory 
 | `loadout ui`        | Local web interface                                              |
 | `loadout bin`       | Manage third-party executables on your PATH                      |
 | `loadout cred`      | Secrets, stored in your OS keychain                              |
-| `loadout env`       | Export the active credentials into your shell                    |
+| `loadout env`       | Print export lines for the active credentials, for `eval`        |
 | `loadout identity`  | Switch git author, SSH key and credentials together              |
 | `loadout sync`      | Keep your configuration in git across machines                   |
 | `loadout scan`      | Check your config for anything that looks like a live credential |
@@ -128,7 +132,7 @@ Secrets live in your OS keychain — Keychain on macOS, libsecret or `pass` on L
 ```sh
 loadout cred set npm_token work    # prompts, does not echo
 loadout cred use npm_token work    # switch the active entry
-eval "$(loadout env)"              # bring the active values into this shell
+eval "$(loadout env)"              # bring the active values into this shell only
 ```
 
 The exported variable name is derived from the credential key — `npm_token`
@@ -145,9 +149,22 @@ credentials:
 Two credentials resolving to the same variable is rejected at load time, since
 otherwise one would silently overwrite the other.
 
-That `eval` is a deliberate cost. Baking secrets into the generated file would put them in plain text on disk, so something has to run to fetch them. loadout does not add it to your shell startup; do that yourself only if you want the values in every shell.
+### Why `loadout env` on its own changes nothing
 
-An identity can nominate credential entries, so `s work` switches your git author, your SSH key and your tokens in one command.
+`loadout env` prints export lines. It does not set them. It runs as a child process, and a child cannot change its parent's environment — the same constraint that makes `p` and `activate` shell functions rather than subcommands. Run it bare and you will see your credentials listed, correctly, while `echo $NPM_TOKEN` stays empty. Nothing has read that output yet.
+
+The `eval` is what applies it, to that one shell. For every shell, add a second line to your shell config, below the `source`:
+
+```sh
+source ~/.config/loadout/init.zsh
+eval "$(loadout env --quiet)"
+```
+
+`--quiet` drops the diagnostics, so a locked or unavailable keychain cannot write into every new shell you open.
+
+This is opt-in on purpose, and the cost is real in both directions. Writing secrets into the generated file would leave them in plain text on disk, so something has to fetch them at runtime instead — but that something reads your keychain every time a shell starts, and puts the tokens in the environment of every process you launch from it. Add the line if you want that; leave it out and use `eval "$(loadout env)"` in the shells that need it.
+
+An identity can nominate credential entries, so `s work` switches your git author, your SSH key and your tokens in one command. It changes which entry is active; the shells you already have open keep the values they were given, until you re-run the `eval`.
 
 ## The web interface
 
