@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Loadout">
+  <!--
+    Compact cut, geometry verbatim from the brand's favicon.svg. The colours
+    differ deliberately: the brand asset is Ink on transparent, which vanishes
+    in a dark tab strip. A tab has no background we control, so the mark has to
+    follow the browser's scheme. Values are the brand's light and dark text
+    colours, and Signal Amber at the value approved for each side.
+
+    Classes rather than fill attributes because CSS beats presentation
+    attributes: a single rule matching the frame would fill it and close the
+    slot. The frame carries stroke only.
+  -->
+  <style>
+    .rule { fill: none; stroke: #1A1A17; }
+    .slug { fill: #1A1A17; }
+    .slot { fill: #C97A16; }
+    @media (prefers-color-scheme: dark) {
+      .rule { stroke: #EDECE5; }
+      .slug { fill: #EDECE5; }
+      .slot { fill: #EDA644; }
+    }
+  </style>
+  <g transform="translate(2,2) scale(0.28)">
+    <rect class="rule" x="4" y="4" width="92" height="92" stroke-width="8"/>
+    <rect class="slug" x="20" y="20" width="60" height="18"/>
+    <rect class="slug" x="20" y="46" width="26" height="34"/>
+    <rect class="slot" x="54" y="46" width="26" height="34"/>
+  </g>
+</svg>

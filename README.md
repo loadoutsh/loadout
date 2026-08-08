@@ -1,3 +1,5 @@
+![loadout — equipped, not accumulated. A curated shell environment you configure.](docs/assets/social-preview.svg)
+
 # loadout
 
 A curated shell environment you configure rather than edit.

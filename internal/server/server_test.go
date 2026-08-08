@@ -210,7 +210,7 @@ func TestTokenInQueryServesThePage(t *testing.T) {
 // way a browser does: no token, no query string, just a Referer.
 func TestStaticAssetsLoadWithoutAToken(t *testing.T) {
 	_, base := start(t)
-	for _, asset := range []string{"/app.css", "/app.js", "/"} {
+	for _, asset := range []string{"/app.css", "/app.js", "/favicon.svg", "/"} {
 		res := do(t, "GET", base+asset, func(r *http.Request) {
 			r.Header.Set("Referer", base+"/")
 		})

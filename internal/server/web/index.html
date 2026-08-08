@@ -5,11 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="referrer" content="no-referrer" />
     <title>loadout</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="app.css" />
   </head>
   <body>
     <header>
-      <h1>loadout</h1>
+      <!-- The mark, inlined rather than <img>, so the rule and slugs inherit
+           currentColor and stay legible in both colour schemes. Geometry is the
+           brand's full cut verbatim; only the slot carries colour. -->
+      <h1 class="brand">
+        <svg class="mark" viewBox="0 0 100 100" aria-hidden="true">
+          <rect
+            x="3.5"
+            y="3.5"
+            width="93"
+            height="93"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="7"
+          />
+          <rect x="18" y="18" width="64" height="18" fill="currentColor" />
+          <rect x="18" y="42" width="29" height="40" fill="currentColor" />
+          <rect x="53" y="42" width="29" height="17" fill="currentColor" />
+          <rect x="53" y="65" width="29" height="17" fill="var(--slot)" />
+        </svg>
+        loadout
+      </h1>
       <div class="meta" id="meta"></div>
       <button id="apply" class="primary" disabled>Review &amp; apply</button>
     </header>

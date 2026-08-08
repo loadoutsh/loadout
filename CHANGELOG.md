@@ -14,6 +14,14 @@ so on the release page, but calling them out here is what tells people why.
 
 ## [Unreleased]
 
+### Added
+
+- The brand mark in the web interface: the lockup in the header, and a favicon,
+  so the tab is identifiable among the other localhost pages you have open. The
+  favicon follows your colour scheme, because the brand asset is ink on
+  transparent and disappears in a dark tab strip.
+- A banner on the README.
+
 ## [0.2.0] - 2026-08-07
 
 ### Added
