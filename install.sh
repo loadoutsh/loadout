@@ -2,7 +2,7 @@
 #
 # loadout installer.
 #
-#   curl -fsSL https://raw.githubusercontent.com/loadoutsh/loadout/main/install.sh | sh
+#   curl -fsSL https://loadout.makery.tools/install.sh | sh
 #
 # POSIX sh, because the shell running this is whatever the user happens to
 # have, which on a minimal server may not be bash.

@@ -1,0 +1,43 @@
+name: Refresh the published installer
+
+# The documentation site serves this installer at /install.sh, which is the
+# URL the README, the release notes and the landing page all advertise. It
+# fetches the file from this branch when it builds, and it has no way to know
+# that the file changed — so a change here would sit unpublished until the
+# site happened to build for some unrelated reason.
+#
+# Only when install.sh actually changes. Every other commit on main leaves the
+# published script identical, and rebuilding the site for those would be noise.
+on:
+  push:
+    branches: [main]
+    paths: ["install.sh"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    # Job level, because a step's own env block is not visible to that step's
+    # own if condition.
+    env:
+      SITE_TOKEN: ${{ secrets.SITE_DISPATCH_TOKEN }}
+    steps:
+      # Skipped rather than failed when no token is configured: this repository
+      # is usable without one, and the site still picks the change up on its
+      # next build. A red X on main for a missing optional secret trains people
+      # to ignore red Xs on main.
+      - name: Ask the site to rebuild
+        if: ${{ env.SITE_TOKEN != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.SITE_DISPATCH_TOKEN }}
+        run: |
+          gh api repos/loadoutsh/site/dispatches \
+            -f event_type=install-script
+
+      - name: Note when the site was not told
+        if: ${{ env.SITE_TOKEN == '' }}
+        run: |
+          echo "::warning::SITE_DISPATCH_TOKEN is not set, so the site was not rebuilt. https://loadout.makery.tools/install.sh will serve the previous script until the site next builds."

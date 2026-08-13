@@ -69,7 +69,7 @@ being coerced into a wrong ordering.
 ## Afterwards
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/loadoutsh/loadout/main/install.sh | sh
+curl -fsSL https://loadout.makery.tools/install.sh | sh
 loadout version
 loadout update --check
 brew upgrade loadout

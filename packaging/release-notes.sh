@@ -107,7 +107,7 @@ cat << EOF
 ## Installing
 
 \`\`\`sh
-curl -fsSL https://raw.githubusercontent.com/loadoutsh/loadout/main/install.sh | sh
+curl -fsSL https://loadout.makery.tools/install.sh | sh
 brew install loadoutsh/loadout/loadout
 go install github.com/loadoutsh/loadout/cmd/loadout@${TAG}
 \`\`\`

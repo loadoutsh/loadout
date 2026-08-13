@@ -11,7 +11,7 @@ Linux and macOS. zsh and bash.
 ## Install
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/loadoutsh/loadout/main/install.sh | sh
+curl -fsSL https://loadout.makery.tools/install.sh | sh
 ```
 
 Or with Homebrew:
