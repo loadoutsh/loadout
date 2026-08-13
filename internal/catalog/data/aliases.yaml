@@ -310,20 +310,25 @@ aliases:
     command: "gh issue"
     category: git
     requires: ["gh"]
-  - name: "clone"
-    command: "repo clone"
+  # Prefixed, and spelled out to gh rather than through the repo alias above.
+  # As bare verbs these were clone/create/fork/view; view shadowed vim's
+  # read-only mode, and all four claimed generic words no shell tool should
+  # take globally. Going through `repo` also meant disabling that one alias
+  # silently broke these four.
+  - name: "ghc"
+    command: "gh repo clone"
     category: git
     requires: ["gh"]
-  - name: "create"
-    command: "repo create"
+  - name: "ghn"
+    command: "gh repo create"
     category: git
     requires: ["gh"]
-  - name: "fork"
-    command: "repo fork"
+  - name: "ghf"
+    command: "gh repo fork"
     category: git
     requires: ["gh"]
-  - name: "view"
-    command: "repo view"
+  - name: "ghv"
+    command: "gh repo view"
     category: git
     requires: ["gh"]
   - name: "fast"

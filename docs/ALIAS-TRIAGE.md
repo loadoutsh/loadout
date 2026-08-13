@@ -62,7 +62,7 @@ Gatsby is worth reconsidering even as a pack; the project has been largely dorma
 
 **PACK `git-flow`** — `finit` `ff` `fr` `fh`
 
-**Flagged, still open** — `clone` `create` `fork` `view`
+**SHIP, renamed** — `clone` `create` `fork` `view` ship as `ghc` `ghn` `ghf` `ghv` (see Resolved)
 
 ## misc.aliases (42, was 45)
 
@@ -111,9 +111,16 @@ Eight aliases removed from the repo outright. Each either shadowed a command use
 
 The commented-out `exa` variants went with `ls`/`la`; `exa` was archived in 2023 and superseded by `eza`. If the modern equivalents are wanted later — `eza`, `yt-dlp`, `fastfetch`, `docker compose` — they come back as new catalog entries rather than as revivals of these.
 
-## Still open
+Four more were renamed rather than dropped. The commands were worth keeping; the names were not theirs to take.
 
-**`clone` `create` `fork` `view`.** Four extremely generic verbs claimed as global aliases. `view` in particular shadows a real command on many systems (the read-only vi mode). Recommend renaming under the `gh` prefix — `ghc`, `ghn`, `ghf`, `ghv` — or dropping.
+| Was      | Now   | Why renamed                                                     |
+| -------- | ----- | --------------------------------------------------------------- |
+| `clone`  | `ghc` | A generic verb claimed globally for one forge's CLI             |
+| `create` | `ghn` | Same, and `create` says nothing about what is created           |
+| `fork`   | `ghf` | Same                                                            |
+| `view`   | `ghv` | Shadowed `view`, vim's read-only mode, present on most installs |
+
+They also spell out `gh repo …` now instead of expanding through the `repo` alias, which had made four aliases depend on a fifth that a user can disable.
 
 ## Open
 

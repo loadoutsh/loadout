@@ -14,6 +14,18 @@ so on the release page, but calling them out here is what tells people why.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-08-13
+
+### Shell output
+
+- The four GitHub CLI aliases are prefixed: `clone`, `create`, `fork` and `view`
+  become `ghc`, `ghn`, `ghf` and `ghv`. As bare verbs they claimed four generic
+  words globally, and `view` shadowed vim's read-only mode, which the catalog's
+  own rule against shadowing familiar commands should never have allowed. They
+  also now spell out `gh repo …` instead of going through the `repo` alias, so
+  disabling `repo` no longer breaks them. **Run `loadout apply`; the old names
+  disappear from your shell.**
+
 ## [0.2.1] - 2026-08-08
 
 ### Added
@@ -79,7 +91,8 @@ First release.
   anything that looks like a live credential.
 - `update` and `uninstall`, both aware of how loadout was installed.
 
-[unreleased]: https://github.com/loadoutsh/loadout/compare/v0.2.1...HEAD
+[unreleased]: https://github.com/loadoutsh/loadout/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/loadoutsh/loadout/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/loadoutsh/loadout/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/loadoutsh/loadout/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/loadoutsh/loadout/releases/tag/v0.1.0
