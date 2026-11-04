@@ -14,6 +14,8 @@ so on the release page, but calling them out here is what tells people why.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-04
+
 ### Shell output
 
 - An identity's `ssh_key` is now optional. Without one, `s` sets the git author
@@ -30,6 +32,12 @@ so on the release page, but calling them out here is what tells people why.
   made ssh print a warning. With a key configured, both behave as before: the
   key is checked and passed with `-i`. The text of both functions changes, so
   `loadout apply` rewrites them even if your config does not.
+
+### Changed
+
+- The install command now points at `https://loadout.makery.tools/install.sh`,
+  in the README and in release notes. The script itself is unchanged, and the
+  old `raw.githubusercontent.com` address still serves it.
 
 ## [0.3.0] - 2026-08-13
 
@@ -108,7 +116,8 @@ First release.
   anything that looks like a live credential.
 - `update` and `uninstall`, both aware of how loadout was installed.
 
-[unreleased]: https://github.com/loadoutsh/loadout/compare/v0.3.0...HEAD
+[unreleased]: https://github.com/loadoutsh/loadout/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/loadoutsh/loadout/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/loadoutsh/loadout/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/loadoutsh/loadout/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/loadoutsh/loadout/compare/v0.1.0...v0.2.0
