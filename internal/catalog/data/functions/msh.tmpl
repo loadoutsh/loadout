@@ -10,7 +10,7 @@ msh() {
 
 Usage: msh [-k keyfile] [-u user] [-m machine] [-p port] [-h]
 
-  -k  SSH key filename in ~/.ssh (default: $keyfile)
+  -k  SSH key filename in ~/.ssh (default: ${keyfile:-none, ssh config chooses})
   -u  Username (default: $user)
   -m  Host alias, hostname, or a bare last octet (default: $host)
   -p  Port (default: $port)
@@ -63,6 +63,14 @@ Configured host aliases: {{ .HostAliases }}"
 		host="{{ .SSH.SubnetPrefix }}$host"
 	fi
 {{- end }}
+
+	# No key from -k, the host or the defaults: leave the choice to
+	# ~/.ssh/config and the agent. That is how a hardware- or TPM-backed key is
+	# used, since it has no private key file to point -i at.
+	if [[ -z "$keyfile" ]]; then
+		ssh -p "$port" "$user@$host"
+		return
+	fi
 
 	if [[ ! -f "$ssh_dir/$keyfile" ]]; then
 		echo "Error: SSH key '$keyfile' not found in $ssh_dir"

@@ -61,10 +61,13 @@ type SSH struct {
 
 // Identity is one git author plus the SSH key and credentials that go with it.
 type Identity struct {
-	ID        string            `yaml:"id"`
-	GitUser   string            `yaml:"git_user"`
-	Email     string            `yaml:"email"`
-	SSHKey    string            `yaml:"ssh_key"`
+	ID      string `yaml:"id"`
+	GitUser string `yaml:"git_user"`
+	Email   string `yaml:"email"`
+	// SSHKey is optional. When it is empty, `s` leaves the SSH agent alone,
+	// for keys that ~/.ssh/config already picks, such as hardware- or
+	// TPM-backed ones held by an agent `ssh-add` would never reach.
+	SSHKey    string            `yaml:"ssh_key,omitempty"`
 	Default   bool              `yaml:"default,omitempty"`
 	Activates map[string]string `yaml:"activates,omitempty"`
 }

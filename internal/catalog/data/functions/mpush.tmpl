@@ -29,5 +29,13 @@ mpush() {
 			;;
 	esac
 
-	scp -i "$key" -P "$port" "$2" "$user@$host:${3:-$upload_path}/$(basename "$2")"
+	local target="$user@$host:${3:-$upload_path}/$(basename "$2")"
+
+	# A host with no key leaves the choice to ~/.ssh/config and the agent.
+	# Passing -i "" instead makes ssh warn and still not say which key it used.
+	if [[ -n "$key" ]]; then
+		scp -i "$key" -P "$port" "$2" "$target"
+	else
+		scp -P "$port" "$2" "$target"
+	fi
 }

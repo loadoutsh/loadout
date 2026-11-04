@@ -359,7 +359,15 @@ mpush() {
 			;;
 	esac
 
-	scp -i "$key" -P "$port" "$2" "$user@$host:${3:-$upload_path}/$(basename "$2")"
+	local target="$user@$host:${3:-$upload_path}/$(basename "$2")"
+
+	# A host with no key leaves the choice to ~/.ssh/config and the agent.
+	# Passing -i "" instead makes ssh warn and still not say which key it used.
+	if [[ -n "$key" ]]; then
+		scp -i "$key" -P "$port" "$2" "$target"
+	else
+		scp -P "$port" "$2" "$target"
+	fi
 }
 
 # SSH helper. Accepts a configured host alias, a bare last octet, or a hostname
@@ -374,7 +382,7 @@ msh() {
 
 Usage: msh [-k keyfile] [-u user] [-m machine] [-p port] [-h]
 
-  -k  SSH key filename in ~/.ssh (default: $keyfile)
+  -k  SSH key filename in ~/.ssh (default: ${keyfile:-none, ssh config chooses})
   -u  Username (default: $user)
   -m  Host alias, hostname, or a bare last octet (default: $host)
   -p  Port (default: $port)
@@ -463,6 +471,14 @@ Configured host aliases: box-a, box-b, edge-a, edge-b, api, broker, py, fr, wb"
 	# A bare number is treated as the last octet of 10.0.0.0
 	if [[ "$host" =~ ^[0-9]+$ ]]; then
 		host="10.0.0.$host"
+	fi
+
+	# No key from -k, the host or the defaults: leave the choice to
+	# ~/.ssh/config and the agent. That is how a hardware- or TPM-backed key is
+	# used, since it has no private key file to point -i at.
+	if [[ -z "$keyfile" ]]; then
+		ssh -p "$port" "$user@$host"
+		return
 	fi
 
 	if [[ ! -f "$ssh_dir/$keyfile" ]]; then
@@ -575,9 +591,13 @@ s() {
 			# new values into this shell in the same step.
 			eval "$(loadout identity activate five --export)"
 			;;
+		agentless)
+			git config --global user.name "Example Five"
+			git config --global user.email "agentless@example.com"
+			;;
 		*)
 			echo "Unknown identity: $id"
-			echo "Known: default, gp, ut, fin, five"
+			echo "Known: default, gp, ut, fin, five, agentless"
 			return 1
 			;;
 	esac
