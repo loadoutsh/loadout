@@ -82,6 +82,11 @@ identities:
     activates:
       npm_token: work
       gh_token: work
+  # No ssh_key: ~/.ssh/config picks the key, for example from a hardware- or
+  # TPM-backed agent, so switching to this identity leaves the agent alone.
+  - id: agentless
+    git_user: Example Five
+    email: agentless@example.com
 
 hosts:
   # Shortcut hosts also emit a bare `ssh <alias>` alias.

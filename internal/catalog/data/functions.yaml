@@ -54,8 +54,10 @@ functions:
     config: [identities]
     notes: |
       Clears the agent before adding the new key, so only one identity's key
-      is loaded at a time. An identity can also nominate which credential
-      entries become active, via its `activates` map.
+      is loaded at a time. An identity without an `ssh_key` leaves the agent
+      untouched, for keys that ~/.ssh/config already selects. An identity can
+      also nominate which credential entries become active, via its
+      `activates` map.
 
   - name: gcfg
     summary: Print the git identity currently in effect.
@@ -90,6 +92,10 @@ functions:
       - ssh
       - config:hosts
     config: [hosts, ssh]
+    notes: |
+      The key comes from -k, then the host's `key`, then `ssh.default_key`. If
+      none names one, msh connects without -i and ~/.ssh/config and the agent
+      choose, which is how a hardware- or TPM-backed key is used.
 
   - name: mpush
     summary: Upload a file to a configured remote host over scp.
@@ -100,6 +106,9 @@ functions:
       - scp
       - config:hosts
     config: [hosts]
+    notes: |
+      Uses the host's `key` when it has one. Without one, ~/.ssh/config and the
+      agent choose the key.
 
   - name: venv
     summary: Create a Python virtual environment under your venv root.

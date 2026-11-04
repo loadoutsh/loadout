@@ -7,8 +7,10 @@ s() {
 		{{ .ID }})
 			git config --global user.name "{{ .GitUser }}"
 			git config --global user.email "{{ .Email }}"
+{{- if .SSHKey }}
 			ssh-add -D > /dev/null 2>&1
 			ssh-add "{{ shpath .SSHKey }}"
+{{- end }}
 {{- if .Activates }}
 			# Swap the credential entries this identity nominates, and bring the
 			# new values into this shell in the same step.

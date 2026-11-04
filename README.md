@@ -91,7 +91,7 @@ identities:
   - id: personal
     git_user: Your Name
     email: you@example.com
-    ssh_key: ~/.ssh/id_ed25519
+    ssh_key: ~/.ssh/id_ed25519 # optional; omit it and `s` leaves the agent alone
     default: true
 
 workspaces:
@@ -103,7 +103,7 @@ hosts:
   - alias: staging
     hostname: staging.example.com
     user: deploy
-    key: ~/.ssh/deploy
+    key: ~/.ssh/deploy # optional; omit it and ~/.ssh/config chooses
 
 packs: [ansible, cloudflared]
 ```

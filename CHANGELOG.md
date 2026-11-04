@@ -14,6 +14,23 @@ so on the release page, but calling them out here is what tells people why.
 
 ## [Unreleased]
 
+### Shell output
+
+- An identity's `ssh_key` is now optional. Without one, `s` sets the git author
+  and swaps credentials but leaves the SSH agent alone. Previously it still ran
+  `ssh-add -D`, which emptied whichever agent `$SSH_AUTH_SOCK` named, and then
+  a bare `ssh-add`. Leave the key out when `~/.ssh/config` already picks it,
+  for example a hardware- or TPM-backed key held by its own agent. Identities
+  that set `ssh_key` generate exactly what they did before. **Run
+  `loadout apply` after removing a key from an identity.**
+- `msh` and `mpush` work without a key. When neither `-k`, the host's `key`
+  nor `ssh.default_key` names one, `msh` now connects without `-i` and lets
+  `~/.ssh/config` and the agent choose; it used to stop with "SSH key '' not
+  found". `mpush` to a host without a `key` no longer passes `-i ""`, which
+  made ssh print a warning. With a key configured, both behave as before: the
+  key is checked and passed with `-i`. The text of both functions changes, so
+  `loadout apply` rewrites them even if your config does not.
+
 ## [0.3.0] - 2026-08-13
 
 ### Shell output
